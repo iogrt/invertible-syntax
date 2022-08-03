@@ -11,20 +11,21 @@
 --
 -- This module contains type classes for invertible syntax.
 module Text.Syntax.Poly.Class (
-  ProductFunctor((<*>)),
+  ProductFunctor((/*/)),
   IsoAlternative((<||>), empty),
-  TryAlternative((<|>), try),
+  TryAlternative((/+/), try),
   AbstractSyntax(syntax, syntaxError),
   Syntax(token)
   ) where
 
-import Control.Isomorphism.Partial (IsoFunctor)
+import Control.Isomorphism.Partial (IsoFunctor, Iso)
+
 
 -- | Apply 'IsoFunctor' to another argument with uncurried style.
 class ProductFunctor f where
-  (<*>) :: f alpha -> f beta -> f (alpha, beta)
+  (/*/) :: f alpha -> f beta -> f (alpha, beta)
 
-infixr 6 <*>
+infixr 6 /*/
 
 -- | Monoid class for 'IsoFunctor'
 class IsoAlternative f where
@@ -42,10 +43,10 @@ class IsoAlternative f => TryAlternative f where
   {- | This method should be implemented for combinators
        which semantics is not full-backtracking like parsec.
        ex. @p <|> q = try p <||> q@ -}
-  (<|>) :: f alpha -> f alpha -> f alpha
-  (<|>) = (<||>)
+  (/+/) :: f alpha -> f alpha -> f alpha
+  (/+/) = (<||>)
 
-infixr 3 <|>, <||>
+infixr 3 /+/, <||>
 
 -- | Syntax abstraction.
 class (IsoFunctor delta, ProductFunctor delta,

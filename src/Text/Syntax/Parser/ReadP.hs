@@ -1,5 +1,5 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE FlexibleInstances, UndecidableInstances #-}
+{-# LANGUAGE FlexibleInstances, UndecidableInstances, Rank2Types, FlexibleContexts #-}
 
 -- |
 -- Module      : Text.Syntax.Poly.Parser.ReadP

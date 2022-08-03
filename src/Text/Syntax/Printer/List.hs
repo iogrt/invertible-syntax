@@ -26,7 +26,7 @@ import Control.Isomorphism.Partial (IsoFunctor ((<$>)), unapply)
 import Control.Monad (liftM2, mplus)
 
 import Text.Syntax.Poly.Class
-  (ProductFunctor ((<*>)),
+  (ProductFunctor ((/*/)),
    IsoAlternative ((<||>), empty), TryAlternative,
    AbstractSyntax (syntax), Syntax (token))
 import Text.Syntax.Poly.Type (ErrorString, errorString)
@@ -50,7 +50,7 @@ instance IsoFunctor (Printer tok) where
 
 -- | 'ProductFunctor' instance for 'Printer'. Just print sequential.
 instance ProductFunctor (Printer tok) where
-  Printer p <*> Printer q
+  Printer p /*/ Printer q
     = Printer (\(x, y) -> liftM2 (++) (p x) (q y))
 
 -- | 'IsoAlternative' instance for 'Printer'. Print first or second.

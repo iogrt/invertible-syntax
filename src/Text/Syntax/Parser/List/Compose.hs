@@ -1,6 +1,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE Rank2Types, FlexibleContexts #-}
 
 -- |
 -- Module      : Text.Syntax.Parser.List.Compose
@@ -26,6 +27,7 @@ import Text.Syntax.Parser.Instances ()
 import Text.Syntax.Poly.Class
   (TryAlternative, Syntax (token))
 import Text.Syntax.Parser.List.Type (RunAsParser, ErrorString, errorString)
+import Control.Applicative (Alternative(..))
 
 -- | Result type of 'Parser'
 data Result a tok = Good !a ![tok] | Bad
@@ -55,11 +57,15 @@ runParser p0 s0 = let z = d p0 s0 in z `seq` z  where
       Bad           -> runParser p2 s
       r1@(Good _ _) -> r1
 
+instance Functor (Parser tok) where
+instance Applicative (Parser tok) where
 instance Monad (Parser tok) where
   return = Prim . Good
   (>>=)  = (:>>=)
+instance MonadFail (Parser tok) where
   fail = const mzero
 
+instance Alternative (Parser tok) where
 instance MonadPlus (Parser tok) where
   mzero = Prim $ const Bad
   mplus = (:<|>)

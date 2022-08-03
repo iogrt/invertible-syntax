@@ -1,5 +1,6 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE Rank2Types, FlexibleContexts #-}
 
 
 -- |
@@ -25,6 +26,7 @@ import Text.Syntax.Parser.Instances ()
 import Text.Syntax.Poly.Class
   (TryAlternative, Syntax (token))
 import Text.Syntax.Parser.List.Type (RunAsParser, ErrorString, errorString)
+import Control.Applicative (Alternative(..))
 
 -- | Naive 'Parser' type. Parse @[tok]@ into @alpha@.
 newtype Parser tok alpha =
@@ -33,12 +35,16 @@ newtype Parser tok alpha =
     runParser :: [tok] -> Maybe (alpha, [tok])
     }
 
+instance Functor (Parser tok) where
+instance Applicative (Parser tok) where
 instance Monad (Parser tok) where
   return a = Parser $ \s -> Just (a, s)
   Parser p >>= fb = Parser (\s -> do (a, s') <- p s
                                      runParser (fb a) s')
+instance MonadFail (Parser tok) where
   fail = const mzero
 
+instance Alternative (Parser tok) where
 instance MonadPlus (Parser tok) where
   mzero = Parser $ const Nothing
   Parser p1 `mplus` p2' =

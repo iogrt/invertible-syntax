@@ -1,6 +1,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE Rank2Types, FlexibleContexts #-}
 
 -- |
 -- Module      : Text.Syntax.Parser.List.Strict
@@ -25,6 +26,7 @@ import Text.Syntax.Parser.Instances ()
 import Text.Syntax.Poly.Class
   (TryAlternative, Syntax (token))
 import Text.Syntax.Parser.List.Type (RunAsParser, ErrorStack, errorString)
+import Control.Applicative (Alternative(..))
 
 -- | Result type of 'Parser'
 data Result a tok = Good !a ![tok] | Bad !ErrorStack
@@ -36,14 +38,18 @@ newtype Parser tok alpha =
     runParser :: [tok] -> ErrorStack -> Result alpha tok
     }
 
+instance Functor (Parser tok) where
+instance Applicative (Parser tok) where
 instance Monad (Parser tok) where
   return !a = Parser $ \s _ -> Good a s
   Parser !p >>= fb = Parser (\s e -> case p s e of
                                 Good a s'   -> case runParser (fb a) s' e of
                                   !rv -> rv
                                 Bad e'      -> Bad $ e' ++ e)
+instance MonadFail (Parser tok) where
   fail msg  = Parser (\_ e -> Bad $ errorString msg : e)
 
+instance Alternative (Parser tok) where
 instance MonadPlus (Parser tok) where
   mzero = Parser $ const Bad
   Parser p1 `mplus` p2' =

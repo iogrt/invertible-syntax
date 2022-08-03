@@ -17,14 +17,14 @@ import Control.Monad (MonadPlus (mzero, mplus))
 
 import Control.Isomorphism.Partial (IsoFunctor)
 import Text.Syntax.Poly.Class
-  (ProductFunctor((<*>)),
+  (ProductFunctor((/*/)),
    IsoAlternative((<||>), empty), TryAlternative,
    AbstractSyntax(syntax, syntaxError))
 
 -- | 'ProductFunctor' instance on 'Monad' context
 -- which is a prerequisite for 'Syntax' definitions.
 instance Monad m => ProductFunctor m where
-  ma <*> mb = do a <- ma
+  ma /*/ mb = do a <- ma
                  b <- mb
                  return (a, b)
 
