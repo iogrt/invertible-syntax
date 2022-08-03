@@ -1,3 +1,4 @@
+{-# LANGUAGE RankNTypes, FlexibleContexts #-}
 -- |
 -- Module      : Text.Syntax.Parser.List.Type
 -- Copyright   : 2012 Kei Hibino

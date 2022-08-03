@@ -37,7 +37,7 @@ module Text.Syntax.Poly.Combinators (
   format
   ) where
 
-import Prelude hiding (foldl, succ, replicate, (.))
+import Prelude hiding (foldl, succ, replicate, (.), (<$>), (*>), (<*>), (<*))
 
 import Control.Isomorphism.Partial.Ext
   (nothing, just, nil, cons, left, right, foldl,

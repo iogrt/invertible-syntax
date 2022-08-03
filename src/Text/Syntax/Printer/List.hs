@@ -1,5 +1,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 -- |
 -- Module      : Text.Syntax.Printer.List
@@ -38,7 +40,7 @@ newtype Printer tok alpha =
     }
 
 -- | Expect print side effect.
-printM :: Monad m => Printer tok alpha -> alpha -> m [tok]
+printM :: MonadFail m => Printer tok alpha -> alpha -> m [tok]
 printM p x = maybe (fail "print error") return $ runPrinter p x
 
 -- | 'IsoFunctor' instance for 'Printer'. Unapplying 'Iso' and print.

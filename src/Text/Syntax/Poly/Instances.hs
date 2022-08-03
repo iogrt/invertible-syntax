@@ -36,6 +36,6 @@ instance MonadPlus m => IsoAlternative m where
 
 -- | 'AbstractSyntax' instance on 'MonadPlus' context
 -- which is a prerequisite for 'Syntax' definitions.
-instance (IsoFunctor m, MonadPlus m, TryAlternative m) => AbstractSyntax m where
+instance (IsoFunctor m, MonadPlus m, TryAlternative m, MonadFail m) => AbstractSyntax m where
   syntax = return
   syntaxError = fail

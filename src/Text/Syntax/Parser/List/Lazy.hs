@@ -1,5 +1,6 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE RankNTypes #-}
 
 -- |
 -- Module      : Text.Syntax.Parser.List.Lazy
@@ -19,6 +20,7 @@ module Text.Syntax.Parser.List.Lazy (
   ) where
 
 import Control.Monad (MonadPlus(mzero, mplus))
+import Control.Applicative(Alternative(..))
 
 import Text.Syntax.Parser.Instances ()
 import Text.Syntax.Poly.Instances ()
@@ -33,12 +35,16 @@ newtype Parser tok alpha =
     runParser :: [tok] -> ErrorStack -> Either ErrorStack (alpha, [tok])
     }
 
+instance Functor (Parser tok) where
+instance Applicative (Parser tok) where
 instance Monad (Parser tok) where
   return a = Parser $ \s _ -> Right (a, s)
   Parser p >>= fb = Parser (\s e -> do (a, s') <- p s e
                                        runParser (fb a) s' e)
+instance MonadFail (Parser tok) where
   fail msg = Parser (\_ e -> Left $ errorString msg : e)
 
+instance Alternative (Parser tok) where
 instance MonadPlus (Parser tok) where
   mzero = Parser $ const Left
   Parser p1 `mplus` p2' =

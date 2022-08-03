@@ -27,6 +27,7 @@ import Control.Isomorphism.Partial.Prim ((<$>), ignore, subset)
 import Text.Syntax.Poly.Class (Syntax, syntax, token)
 import Text.Syntax.Poly.Combinators
   (many, this, (<*), skipMany, skipSome)
+import Prelude hiding ((<$>), (<*) )
 
 -- | Syntax of passed 'Char'.
 char :: Syntax Char delta => Char -> delta Char
