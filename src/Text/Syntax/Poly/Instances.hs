@@ -14,6 +14,7 @@
 module Text.Syntax.Poly.Instances () where
 
 import Control.Monad (MonadPlus (mzero, mplus))
+import Control.Monad.Fail (MonadFail)
 
 import Control.Isomorphism.Partial (IsoFunctor)
 import Text.Syntax.Poly.Class

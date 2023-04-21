@@ -31,18 +31,25 @@ module Text.Syntax.Poly.Combinators (
   between,
   -- * Alternation
   choice,
-  optional, bool,
+  optional, optional_ , bool,
   (/$?/), (/?$/),
   -- * Printing
-  format
+  format,
+  -- others
+  isoFail,
+  notFollowedBy,
+  nonEmptyIso,
+  someNE
   ) where
 
 import Prelude hiding (foldl, succ, replicate, (.))
+import qualified Data.List.NonEmpty as NE
 
+import Control.Isomorphism.Partial.Unsafe (Iso (Iso))
 import Control.Isomorphism.Partial.Ext
   (nothing, just, nil, cons, left, right, foldl,
    (.), Iso, (/$/), inverse, element, unit, commute, ignore,
-   mayAppend, mayPrepend, succ)
+   mayAppend, mayPrepend, succ, iso)
 
 import Text.Syntax.Poly.Class
   ((/*/), (/+/), empty,
@@ -138,6 +145,10 @@ choice []     = empty
 optional :: AbstractSyntax delta => delta alpha -> delta (Maybe alpha)
 optional x = just /$/ x /+/ nothing /$/ syntax ()
 
+-- | optional but discards output
+optional_ :: AbstractSyntax delta => delta () -> delta ()
+optional_ x = x /+/ syntax ()
+
 -- | The 'bool' combinator parse \/ print passed syntax or not.
 bool :: AbstractSyntax delta => delta () -> delta Bool
 bool x = x */ syntax True /+/ syntax False
@@ -169,3 +180,30 @@ infix 5 /$?/, /?$/
 -- This is useful in cases when just formatting with indents.
 format :: (Syntax tok delta, Eq tok) => [tok] -> delta ()
 format tks = ignore (Just ()) /$/ optional (list tks)
+
+
+-- succeed if op fails, fail if op succeeds
+-- isoFail False so it doesn't print
+-- implementation: run op with bool to see if it succeeded or not,
+-- giving the success to isoFail, meaning that success will invert into failure
+notFollowedBy :: (AbstractSyntax delta) => delta () -> delta ()
+notFollowedBy op = inverse (isoFail False id) /$/ bool op
+
+
+nonEmptyIso = iso NE.fromList NE.toList
+
+someNE a = nonEmptyIso /$/ some a
+
+
+-- shorthand for giving fail conditions
+-- arguments are ordered by the order of iso construction
+-- easy to use with applicative:
+-- g :: a -> a -> a
+-- (isoFail <*> g) x == isoFail x (g x)
+
+-- v: arg to give for printing,
+-- f: parse fail condition
+isoFail :: v -> (v -> Bool) -> Iso () v
+isoFail v f = Iso
+  (const $ Just v)
+  (\x -> if f x then Nothing else Just ())

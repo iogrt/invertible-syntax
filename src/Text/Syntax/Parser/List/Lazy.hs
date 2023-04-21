@@ -20,6 +20,7 @@ module Text.Syntax.Parser.List.Lazy (
   ) where
 
 import Control.Monad (MonadPlus(mzero, mplus))
+import Control.Monad.Fail (MonadFail(..))
 import Control.Applicative(Alternative(..))
 
 import Text.Syntax.Parser.Instances ()
@@ -60,9 +61,13 @@ instance Eq tok => Syntax tok (Parser tok) where
                      []   -> Left $ errorString "The end of token stream." : e)
 
 -- | Run 'Syntax' as @'Parser' tok@.
-runAsParser :: Eq tok => RunAsParser tok a ErrorStack
+runAsParser :: (Eq tok, Show tok, Show a) => RunAsParser tok a ErrorStack
 runAsParser parser s =
-  do (a, s') <- runParser parser s []
-     if s' == []
-       then Right a
-       else Left [errorString "Not the end of token stream."]
+  do
+    (a, s') <- runParser parser s []
+    if s' == []
+      then Right a
+      else Left [(errorString $
+                  "Not the end of token stream, tokens missing: " ++ show s'
+                  ++ "\n\nand the content parsed:" ++ show a
+                 )]

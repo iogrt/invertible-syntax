@@ -22,6 +22,7 @@ module Text.Syntax.Parser.List.Compose (
   ) where
 
 import Control.Monad (MonadPlus(mzero, mplus))
+import Control.Monad.Fail (MonadFail(..))
 
 import Text.Syntax.Parser.Instances ()
 import Text.Syntax.Poly.Class

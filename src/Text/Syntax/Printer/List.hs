@@ -31,6 +31,7 @@ import Text.Syntax.Poly.Class
    AbstractSyntax (syntax), Syntax (token))
 import Text.Syntax.Poly.Type (ErrorString, errorString)
 import qualified Text.Syntax.Poly.Type as T
+import Control.Monad.Fail (MonadFail)
 
 -- | Naive 'Printer' type. Print @alpha@ into @[tok]@.
 newtype Printer tok alpha =
