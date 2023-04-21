@@ -1,6 +1,6 @@
-{ pkgs ? import <nixpkgs> {}, compiler ? "ghc865" }:
+{ pkgs ? import <nixpkgs> {}, compiler ? "ghc865", hsPkgs ? pkgs.haskellPackages}:
 let
-  hsPkgs =  pkgs.haskellPackages; #pkgs.haskell.packages.${compiler}; # 
+  #hsPkgs =  pkgs.haskellPackages; #pkgs.haskell.packages.${compiler}; # 
   pkg = hsPkgs.callCabal2nix "invertible-syntax" ./. {  };
   # was giving errors due to lorri stuff
   # shell = 
