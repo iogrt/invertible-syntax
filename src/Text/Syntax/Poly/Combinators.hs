@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TupleSections #-}
 
 -- |
 -- Module      : Text.Syntax.Poly.Combinators
@@ -39,7 +40,8 @@ module Text.Syntax.Poly.Combinators (
   isoFail,
   notFollowedBy,
   nonEmptyIso,
-  someNE
+  someNE,
+  someUntil
   ) where
 
 import Prelude hiding (foldl, succ, replicate, (.))
@@ -71,6 +73,13 @@ many p = some p /+/ none
 some :: AbstractSyntax delta => delta alpha -> delta [alpha]
 some p = cons /$/ p /*/ many p
 
+someUntil :: AbstractSyntax delta => delta a -> delta b -> delta ([a],b)
+someUntil synGo synEnd =
+  (iso ([],) snd /$/ synEnd)
+  -- have to define it with raws, not functors!
+  -- /+/ (iso (\(a,(as,b)) -> (a:as,b)) _ /$/ synGo /*/ someUntil synGo synEnd)
+  /+/ (iso (\(a,(as,b)) -> (a:as,b)) (\(a:as,b) -> (a,(as,b))) /$/ synGo /*/ someUntil synGo synEnd)
+
 -- | The 'replicate' combinator is used to repeat syntax.
 -- @replicate n p@ repeats the passwd syntax @p@
 -- @n@ times.
@@ -81,7 +90,7 @@ replicate n' p = rec n' where
 
 
 either :: AbstractSyntax delta => delta alpha -> delta beta -> delta (Either alpha beta)
-either p q = (left /$/ p) /+/ (right /$/ q) 
+either p q = (left /$/ p) /+/ (right /$/ q)
 
 -- | The 'this' combinator parses\/prints a fixed token
 this :: (Syntax tok delta, Eq tok) => tok -> delta ()
@@ -119,7 +128,7 @@ between p q r = p */ r /* q
 -- left-associative chain of infix operators. 
 chainl1 :: AbstractSyntax delta =>
            delta alpha -> delta beta -> Iso (alpha, (beta, alpha)) alpha -> delta alpha
-chainl1 arg op f 
+chainl1 arg op f
   = foldl f /$/ arg /*/ many (op /*/ arg)
 
 -- | The 'count' combinator counts fixed syntax.
@@ -156,7 +165,7 @@ bool x = x */ syntax True /+/ syntax False
 -- | The 'sepBy' combinator separates syntax into delimited list.
 -- @sepBy p d@ is @p@ list syntax delimited by @d@ syntax.
 sepBy :: AbstractSyntax delta => delta alpha -> delta () -> delta [alpha]
-sepBy x sep 
+sepBy x sep
   =    x `sepBy1` sep
   /+/  none
 
