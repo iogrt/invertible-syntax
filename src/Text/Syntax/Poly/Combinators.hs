@@ -41,7 +41,7 @@ module Text.Syntax.Poly.Combinators (
   notFollowedBy,
   nonEmptyIso,
   someNE,
-  someUntil
+  manyUntil 
   ) where
 
 import Prelude hiding (foldl, succ, replicate, (.))
@@ -73,12 +73,13 @@ many p = some p /+/ none
 some :: AbstractSyntax delta => delta alpha -> delta [alpha]
 some p = cons /$/ p /*/ many p
 
-someUntil :: AbstractSyntax delta => delta a -> delta b -> delta ([a],b)
-someUntil synGo synEnd =
-  (iso ([],) snd /$/ synEnd)
-  -- have to define it with raws, not functors!
-  -- /+/ (iso (\(a,(as,b)) -> (a:as,b)) _ /$/ synGo /*/ someUntil synGo synEnd)
-  /+/ (iso (\(a,(as,b)) -> (a:as,b)) (\(a:as,b) -> (a,(as,b))) /$/ synGo /*/ someUntil synGo synEnd)
+manyUntil :: AbstractSyntax delta => delta a -> delta b -> delta ([a],b)
+manyUntil synGo synEnd = go where
+  go = (Iso (Just . ([],)) (\(as,b) -> case as of
+      [] -> Just b
+      a : as' -> Nothing
+    ) /$/ synEnd)
+    /+/ (iso (\(a,(as,b)) -> (a:as,b)) (\(a:as,b) -> (a,(as,b))) /$/ synGo /*/ go)
 
 -- | The 'replicate' combinator is used to repeat syntax.
 -- @replicate n p@ repeats the passwd syntax @p@
