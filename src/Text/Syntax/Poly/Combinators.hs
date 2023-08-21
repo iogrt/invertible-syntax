@@ -41,7 +41,8 @@ module Text.Syntax.Poly.Combinators (
   notFollowedBy,
   nonEmptyIso,
   someNE,
-  manyUntil 
+  manyUntil,
+  someUntil
   ) where
 
 import Prelude hiding (foldl, succ, replicate, (.))
