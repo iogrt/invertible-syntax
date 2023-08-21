@@ -56,6 +56,7 @@ import Control.Isomorphism.Partial.Ext
 import Text.Syntax.Poly.Class
   ((/*/), (/+/), empty,
    AbstractSyntax(syntax), Syntax(token))
+import Data.List.NonEmpty (NonEmpty(..))
 
 -- | 'none' parses\/prints empty tokens stream consume\/produces a empty list.
 none :: AbstractSyntax delta => delta [alpha]
@@ -80,6 +81,13 @@ manyUntil synGo synEnd = go where
       a : as' -> Nothing
     ) /$/ synEnd)
     /+/ (iso (\(a,(as,b)) -> (a:as,b)) (\(a:as,b) -> (a,(as,b))) /$/ synGo /*/ go)
+
+someUntil :: AbstractSyntax delta => delta a -> delta b -> delta (NonEmpty a,b)
+someUntil synGo synEnd = 
+  iso 
+    (\(a,(as,b)) -> (a:|as,b))
+    (\(a:|as,b) -> (a,(as,b))) 
+    /$/ synGo /*/ manyUntil synGo synEnd
 
 -- | The 'replicate' combinator is used to repeat syntax.
 -- @replicate n p@ repeats the passwd syntax @p@
