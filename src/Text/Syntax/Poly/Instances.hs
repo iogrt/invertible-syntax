@@ -1,5 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE InstanceSigs #-}
 
 -- |
 -- Module      : Text.Syntax.Poly.Instances
@@ -25,6 +26,7 @@ import Text.Syntax.Poly.Class
 -- | 'ProductFunctor' instance on 'Monad' context
 -- which is a prerequisite for 'Syntax' definitions.
 instance Monad m => ProductFunctor m where
+  (/*/) :: Monad m => m alpha -> m beta -> m (alpha, beta)
   ma /*/ mb = do a <- ma
                  b <- mb
                  return (a, b)
@@ -33,6 +35,7 @@ instance Monad m => ProductFunctor m where
 -- which is a prerequisite for 'Syntax' definitions.
 instance MonadPlus m => IsoAlternative m where
   (<||>) = mplus
+  empty :: MonadPlus m => m alpha
   empty  = mzero
 
 -- | 'AbstractSyntax' instance on 'MonadPlus' context

@@ -1,7 +1,7 @@
 name:                invertible-syntax
 version:             0.1.1.0
-synopsis:            My flavour of the invertible-syntax library, based on invertible-syntax-poly
-description:            My flavour of the invertible-syntax library, based on invertible-syntax-poly
+synopsis:            My flavour of the invertible-syntax library, based on invertible-syntax-poly and partial-isomorphisms packages
+description:            My flavour of the invertible-syntax library, based on invertible-syntax-poly and partial-isomorphisms packages
 license:             BSD3
 license-file:        LICENSE
 author:              Duarte Dias <duarte.dd.dias@gmail.com>
@@ -35,8 +35,7 @@ library
                         Text.Syntax.Printer.List
                         Text.Syntax.Check.Prim
   
-  build-depends:        base < 5
-                      , partial-isomorphisms
+  build-depends:        base < 5, template-haskell
   
 
 source-repository head
