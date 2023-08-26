@@ -84,10 +84,10 @@ manyUntil synGo synEnd = go where
     /+/ (iso (\(a,(as,b)) -> (a:as,b)) (\(a:as,b) -> (a,(as,b))) /$/ synGo /*/ go)
 
 someUntil :: AbstractSyntax delta => delta a -> delta b -> delta (NonEmpty a,b)
-someUntil synGo synEnd = 
-  iso 
+someUntil synGo synEnd =
+  iso
     (\(a,(as,b)) -> (a:|as,b))
-    (\(a:|as,b) -> (a,(as,b))) 
+    (\(a:|as,b) -> (a,(as,b)))
     /$/ synGo /*/ manyUntil synGo synEnd
 
 -- | The 'replicate' combinator is used to repeat syntax.
@@ -130,7 +130,7 @@ p /* q = inverse unit /$/ p /*/ q
 
 infixl 7 */, /*
 
--- | The 'between' function combines '*>' and '<*' in the obvious way.
+-- | The 'between' function combines '*/' and '/*' in the obvious way.
 between :: AbstractSyntax delta => delta () -> delta () -> delta alpha -> delta alpha
 between p q r = p */ r /* q
 
@@ -157,8 +157,7 @@ skipSome p = p /* skipMany p
 
 -- | 'choice' a syntax from list.
 choice :: AbstractSyntax delta => [delta alpha] -> delta alpha
-choice (s:ss) = s /+/ choice ss
-choice []     = empty
+choice = foldr (/+/) empty
 
 -- | The 'optional' combinator may parse \/ print passed syntax.
 optional :: AbstractSyntax delta => delta alpha -> delta (Maybe alpha)
