@@ -30,9 +30,4 @@ import Control.Isomorphism.Partial.Ext.Prim
 import Control.Isomorphism.Partial.Ext.Constructors
 import Control.Isomorphism.Partial.Ext.Data
 
--- rename IsoFunctor infix, the infix operators were inspired from the 'syntax' package.
-(/$/) :: IsoFunctor f => Iso alpha beta -> f alpha -> f beta
-(/$/) = (PartialIso.<$>)
-infixr 6 /$/
-
 {-# ANN module "ignore import/export shortcut" #-}

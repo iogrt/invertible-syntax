@@ -10,6 +10,10 @@
 -- This module contains @Iso@ definitions which are inverted definitions
 -- defined in @Control.Isomorphism.Partial.Constructors@.
 
+
+
+-- I think I want to delete this one. Not too useful
+
 module Control.Isomorphism.Partial.Ext.Constructors (
   cons', nil',
   just', nothing',

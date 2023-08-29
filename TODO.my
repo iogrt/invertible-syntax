@@ -1,0 +1,23 @@
+Tweaks I intend on doing to this package:
+- Stop using IsoAlternative and go for just Alternative. Types seem similar.
+    - Is the applicative f restrition too much?
+    --- The | combinator
+        has been generalized in the standard Alternative type class. But
+        Alternative declares a superclass constraint to Applicative, which
+        is not suitable for syntax descriptions. We therefore need a version
+        of Alternative which is superclass independent.
+    -- whatever the case may be. It's super useful to put all isoAlternative combinators into a isoalternative file!
+    --
+
+- Simplify Ext and remove it.
+
+- simplify parsers and printers implementations. put them in a more specific place.
+    - could printers and parsers be generalized??
+
+- Maybe Text.syntax.poly.class should be moved elsewhere?
+- move any combinators that dont need Isofunctor,isoproduct,etc to go out!
+- move each typeclass into it's file. Define the combinators of it there!
+
+-- better invertiblesyntax typeclassings
+- https://blog.poisson.chat/posts/2016-10-18-typeclass-interface.html 
+-- why is lazyMaybe not implemented through the "naive" parser?

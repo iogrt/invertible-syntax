@@ -2,6 +2,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE Rank2Types, FlexibleContexts #-}
+{-# LANGUAGE LambdaCase #-}
 
 -- |
 -- Module      : Text.Syntax.Parser.List.Compose
@@ -74,7 +75,7 @@ instance MonadPlus (Parser tok) where
 instance TryAlternative (Parser tok)
 
 instance Eq tok => Syntax tok (Parser tok) where
-  token = Prim (\s -> case s of
+  token = Prim (\case
                    t:ts -> Good t ts
                    []   -> Bad)
 

@@ -16,7 +16,7 @@ import Prelude ()
 import Data.Either (Either (Left, Right))
 import Data.Maybe (Maybe (Just, Nothing))
 
-import Control.Isomorphism.Partial.Unsafe (Iso (Iso))
+import Control.Isomorphism.Partial.Prim (Iso (Iso))
 import Control.Isomorphism.Partial.TH (defineIsomorphisms)
 
 nil :: Iso () [alpha]

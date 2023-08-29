@@ -48,21 +48,22 @@ module Text.Syntax.Poly.Combinators (
 import Prelude hiding (foldl, succ, replicate, (.))
 import qualified Data.List.NonEmpty as NE
 
-import Control.Isomorphism.Partial.Unsafe (Iso (Iso))
+import Control.Applicative ((<*>))
+import Control.Isomorphism.Partial.Prim (Iso (Iso))
 import Control.Isomorphism.Partial.Ext
   (nothing, just, nil, cons, left, right, foldl,
    (.), Iso, (/$/), inverse, element, unit, commute, ignore,
    mayAppend, mayPrepend, succ, iso)
 
 import Text.Syntax.Poly.Class
-  ((/*/), (/+/), empty,
-   AbstractSyntax(syntax), Syntax(token))
+  ((/*/), (/+/),AbstractSyntax(syntax), Syntax(token), empty)
 import Data.List.NonEmpty (NonEmpty(..))
 
 -- | 'none' parses\/prints empty tokens stream consume\/produces a empty list.
 none :: AbstractSyntax delta => delta [alpha]
 none =  nil /$/ syntax ()
 
+-- TODO: put these in IsoAlternative file
 -- | The 'many' combinator is used to repeat syntax.
 -- @many p@ repeats the passed syntax @p@
 -- zero or more than zero times.

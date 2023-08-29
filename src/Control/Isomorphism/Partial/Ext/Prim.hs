@@ -20,8 +20,7 @@ module Control.Isomorphism.Partial.Ext.Prim (
 import Prelude hiding (id)
 import qualified Prelude as P
 import Control.Category (id)
-import Control.Isomorphism.Partial.Prim (inverse, apply, unapply)
-import Control.Isomorphism.Partial.Unsafe (Iso (Iso))
+import Control.Isomorphism.Partial.Prim (inverse, apply, unapply, Iso(Iso))
 
 -- | strict version of apply
 apply' :: Iso alpha beta -> alpha -> Maybe beta

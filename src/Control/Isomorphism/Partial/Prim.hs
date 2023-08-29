@@ -1,11 +1,11 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Control.Isomorphism.Partial.Prim
-  ( Iso ()
+  ( Iso (Iso)
   , inverse
   , apply
   , unapply
-  , IsoFunctor ((<$>))
+  , IsoFunctor ((/$/))
   , ignore
   , (***)
   , (|||)
@@ -14,12 +14,11 @@ module Control.Isomorphism.Partial.Prim
   , unit
   , element
   , subset
-  , iterate
+  , iterateIso
   , distribute
   ) where
 
-import Prelude ()
-
+import Prelude hiding ((.))
 import Control.Monad (liftM2, (>=>), fmap, mplus)
 import Control.Category (Category (id, (.)))
 
@@ -28,26 +27,25 @@ import Data.Either (Either (Left, Right))
 import Data.Eq (Eq ((==)))
 import Data.Maybe (Maybe (Just, Nothing))
 
-import Control.Isomorphism.Partial.Unsafe (Iso (Iso))
+import Control.Applicative ((<*>))
+
+data Iso alpha beta = Iso 
+  { apply :: alpha -> Maybe beta
+  , unapply :: beta -> Maybe alpha
+  }
 
 inverse :: Iso alpha beta -> Iso beta alpha
 inverse (Iso f g) = Iso g f
-
-apply :: Iso alpha beta -> alpha -> Maybe beta
-apply (Iso f _) = f
-
-unapply  ::  Iso alpha beta -> beta -> Maybe alpha
-unapply  =   apply . inverse
 
 instance Category Iso where
   g . f  =  Iso  (apply f >=> apply g)
                  (unapply g >=> unapply f)
   id     =  Iso  Just Just
 
-infix 5 <$>
+infix 5 /$/
 
 class IsoFunctor f where
-  (<$>) :: Iso alpha beta -> (f alpha -> f beta)
+  (/$/) :: Iso alpha beta -> f alpha -> f beta
 
 ignore :: alpha -> Iso alpha ()
 ignore x = Iso f g where
@@ -60,8 +58,8 @@ ignore x = Iso f g where
 -- to work on the two components of a tuple.
 (***) :: Iso alpha beta -> Iso gamma delta -> Iso (alpha, gamma) (beta, delta)
 i *** j = Iso f g where
-  f (a, b) = liftM2 (,) (apply i a) (apply j b)
-  g (c, d) = liftM2 (,) (unapply i c) (unapply j d)
+  f (a, b) = (,) <$> apply i a <*> apply j b
+  g (c, d) = (,) <$> unapply i c <*> unapply j d
 
 -- | The mediating arrow for sums constructed with `Either`.
 -- This is not a proper partial isomorphism because of `mplus`.
@@ -110,8 +108,8 @@ subset :: (alpha -> Bool) -> Iso alpha alpha
 subset p = Iso f f where
   f x | p x = Just x | otherwise = Nothing
 
-iterate :: Iso alpha alpha -> Iso alpha alpha
-iterate step = Iso f g where
+iterateIso :: Iso alpha alpha -> Iso alpha alpha
+iterateIso step = Iso f g where
   f = Just . driver (apply step)
   g = Just . driver (unapply step)
 

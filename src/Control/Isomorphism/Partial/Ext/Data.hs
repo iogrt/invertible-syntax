@@ -12,7 +12,7 @@
 
 module Control.Isomorphism.Partial.Ext.Data (
   succ, singleton,
-  readShow, negate, not, reverse,
+  readShow,
   digitInt, chrOrd, oct, hex,
   signumAbs, digitsFloat, floatTripleDigits, floatTriple
   ) where
@@ -26,7 +26,7 @@ import Data.Char (intToDigit, digitToInt, ord, chr)
 import Data.List (foldl')
 import Numeric (readOct, showOct, readHex, showHex, floatToDigits)
 
-import Control.Isomorphism.Partial.Unsafe (Iso (Iso))
+import Control.Isomorphism.Partial.Prim (Iso (Iso))
 import Control.Isomorphism.Partial.Ext.Prim (iso)
 
 -- | Church number succ isomorphism
@@ -43,22 +43,9 @@ singleton = Iso f g where
   g [x] = Just x
   g _   = Nothing
 
-
 -- | Isomorphism from read and show
 readShow :: (Read a, Show a) => Iso String a
 readShow =  iso read show
-
--- | Negate number
-negate :: Num a => Iso a a
-negate =  iso P.negate P.negate
-
--- | Negate boolean
-not :: Iso Bool Bool
-not =  iso P.not P.not
-
--- | List reverse
-reverse :: Iso [a] [a]
-reverse =  iso P.reverse P.reverse
 
 -- | digit char and integer
 digitInt :: Iso Char Int

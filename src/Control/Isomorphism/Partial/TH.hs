@@ -9,7 +9,7 @@ import           Data.Char                          (toLower)
 import           Data.List                          (find)
 import           Language.Haskell.TH
 
-import           Control.Isomorphism.Partial.Unsafe (Iso (Iso))
+import           Control.Isomorphism.Partial.Prim (Iso (Iso))
 
 gadtError :: a
 gadtError = error "Control.Isomorphism.Partial.TH: GADTs currently not supported."
