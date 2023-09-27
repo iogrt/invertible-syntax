@@ -1,6 +1,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE Rank2Types, FlexibleContexts #-}
+{-# LANGUAGE LambdaCase #-}
 
 
 -- |
@@ -30,30 +31,31 @@ import Text.Syntax.Parser.List.Type (RunAsParser, ErrorString, errorString)
 import Control.Applicative (Alternative(..))
 
 -- | Naive 'Parser' type. Parse @[tok]@ into @alpha@.
-newtype Parser tok alpha =
+-- lazy maybe parser
+newtype LMParser tok alpha =
   Parser {
     -- | Function to run parser
     runParser :: [tok] -> Maybe (alpha, [tok])
     }
 
-instance Functor (Parser tok) where
-instance Applicative (Parser tok) where
-instance Monad (Parser tok) where
+instance Functor (LMParser tok) where
+instance Applicative (LMParser tok) where
+instance Monad (LMParser tok) where
   return a = Parser $ \s -> Just (a, s)
   Parser p >>= fb = Parser (\s -> do (a, s') <- p s
                                      runParser (fb a) s')
-instance MonadFail (Parser tok) where
+instance MonadFail (LMParser tok) where
   fail = const mzero
 
-instance Alternative (Parser tok) where
-instance MonadPlus (Parser tok) where
+instance Alternative (LMParser tok) where
+instance MonadPlus (LMParser tok) where
   mzero = Parser $ const Nothing
   Parser p1 `mplus` p2' =
     Parser (\s -> p1 s `mplus` runParser p2' s)
 
 
-instance Eq tok => Syntax tok (Parser tok) where
-  token = Parser (\s -> case s of
+instance Eq tok => Syntax tok (LMParser tok) where
+  token = Parser (\case
                      t:ts -> Just (t, ts)
                      []   -> Nothing)
 
@@ -61,6 +63,6 @@ instance Eq tok => Syntax tok (Parser tok) where
 runAsParser :: Eq tok => RunAsParser tok a ErrorString
 runAsParser parser s = case runParser parser s of
   Just (a, [])    -> Right a
-  Just (_, (_:_)) -> Left . errorString $ "Not the end of token stream."
+  Just (_, _:_) -> Left . errorString $ "Not the end of token stream."
   Nothing         -> Left . errorString $ "parse error"
 
