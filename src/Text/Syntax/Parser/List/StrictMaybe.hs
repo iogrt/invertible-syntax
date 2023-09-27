@@ -26,7 +26,7 @@ import Control.Monad.Fail (MonadFail(..))
 import Text.Syntax.Parser.Instances ()
 import Text.Syntax.Poly.Class
   (Syntax (token))
-import Text.Syntax.Parser.List.Type (RunAsParser, ErrorString, errorString)
+import Text.Syntax.Parser.List.Type (RunAsParser, SyntaxError(..))
 import Control.Applicative (Alternative(..))
 
 -- | Result type of 'Parser'
@@ -69,8 +69,8 @@ instance Eq tok => Syntax tok (Parser tok) where
                      []   -> Bad)
 
 -- | Run 'Syntax' as @'Parser' tok@.
-runAsParser :: Eq tok => RunAsParser tok a ErrorString
+runAsParser :: Eq tok => RunAsParser tok a SyntaxError
 runAsParser parser s = case runParser parser s of
   Good x []    -> Right x
-  Good _ (_:_) -> Left  $ errorString "Not the end of token stream."
-  Bad          -> Left  $ errorString "StrictList: parse error."
+  Good _ (_:_) -> Left  $ ErrorString "Not the end of token stream."
+  Bad          -> Left  $ ErrorString "StrictList: parse error."

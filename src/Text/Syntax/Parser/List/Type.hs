@@ -20,11 +20,11 @@ module Text.Syntax.Parser.List.Type (
   module Text.Syntax.Poly.Type
   ) where
 
-import Text.Syntax.Poly.Type (ErrorString, errorString)
+import Text.Syntax.Poly.Type (SyntaxError(..))
 import qualified Text.Syntax.Poly.Type as T
 
 -- | Type to store error state
-type ErrorStack = [ErrorString]
+type ErrorStack a b = [SyntaxError a b]
 
 -- | Type to run invertible syntax definitions as parsers
 type RunAsParser tok a e = T.RunAsParser tok [tok] a e

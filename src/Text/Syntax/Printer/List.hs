@@ -28,7 +28,7 @@ import Control.Applicative
 import Text.Syntax.Poly.Class
   (ProductFunctor ((/*/)), IsoAlternative(..),
    AbstractSyntax (syntax), Syntax (token))
-import Text.Syntax.Poly.Type (ErrorString, errorString)
+import Text.Syntax.Poly.Type (SyntaxError(..))
 import qualified Text.Syntax.Poly.Type as T
 import Control.Monad.Fail (MonadFail)
 import Control.Monad ((>=>),liftM2,mplus)
@@ -82,6 +82,6 @@ type RunAsStringPrinter a e = RunAsPrinter Char a e
 
 -- | Run 'Syntax' type as 'Printer'.
 runAsPrinter :: (Monoid tok,Eq tok) => RunAsPrinter tok a ErrorString
-runAsPrinter printer = maybe (Left . errorString $ "print error") Right
+runAsPrinter printer = maybe (Left . ErrorString $ "print error") Right
                        . runPrinter printer
 

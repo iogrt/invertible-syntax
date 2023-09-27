@@ -26,7 +26,7 @@ import Control.Monad.Fail (MonadFail(..))
 import Text.Syntax.Parser.Instances ()
 import Text.Syntax.Poly.Class
   (IsoAlternative, Syntax (token))
-import Text.Syntax.Parser.List.Type (RunAsParser, ErrorStack, errorString)
+import Text.Syntax.Parser.List.Type (RunAsParser, ErrorStack)
 import Control.Applicative (Alternative(..))
 
 -- | Result type of 'Parser'
@@ -48,7 +48,7 @@ instance Monad (Parser tok) where
                                   !rv -> rv
                                 Bad e'      -> Bad $ e' ++ e)
 instance MonadFail (Parser tok) where
-  fail msg  = Parser (\_ e -> Bad $ errorString msg : e)
+  fail msg  = Parser (\_ e -> Bad $ ErrorString msg : e)
 
 instance Alternative (Parser tok) where
 instance MonadPlus (Parser tok) where
@@ -63,11 +63,11 @@ instance MonadPlus (Parser tok) where
 instance Eq tok => Syntax tok (Parser tok) where
   token = Parser (\s e -> case s of
                      t:ts -> Good t ts
-                     []   -> Bad $ errorString "eof" : e)
+                     []   -> Bad $ ErrorString "eof" : e)
 
 -- | Run 'Syntax' as @'Parser' tok@.
 runAsParser :: Eq tok => RunAsParser tok a ErrorStack
 runAsParser parser s = case runParser parser s [] of
   Good x []    -> Right x
-  Good _ (_:_) -> Left  [errorString "Not the end of token stream."]
+  Good _ (_:_) -> Left  [ErrorString "Not the end of token stream."]
   Bad  err     -> Left  err

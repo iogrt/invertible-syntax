@@ -28,7 +28,7 @@ import Control.Monad.Fail (MonadFail(..))
 import Text.Syntax.Parser.Instances ()
 import Text.Syntax.Poly.Class
   (IsoAlternative, Syntax (token))
-import Text.Syntax.Parser.List.Type (RunAsParser, ErrorString, errorString)
+import Text.Syntax.Parser.List.Type (RunAsParser, SyntaxError, ErrorString)
 import Control.Applicative (Alternative(..))
 
 -- | Result type of 'Parser'
@@ -78,6 +78,6 @@ instance Eq tok => Syntax tok (Parser tok) where
                    []   -> Bad)
 
 -- | Run 'Syntax' as @'Parser' tok@.
-runAsParser :: Eq tok => RunAsParser tok a ErrorString
-runAsParser parser = maybe (Left . errorString $ "parse error") Right
+runAsParser :: Eq tok => RunAsParser tok a SyntaxError
+runAsParser parser = maybe (Left . ErrorString $ "parse error") Right
                      . maybeOfResult . runParser parser

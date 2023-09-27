@@ -29,7 +29,7 @@ import Control.Monad.Fail (MonadFail(..))
 
 import Text.Syntax.Parser.Generic
 import Text.Syntax.Poly.Class
-import Text.Syntax.Parser.List.Type (RunAsParser, ErrorString, errorString)
+import Text.Syntax.Parser.List.Type (RunAsParser, SyntaxError(..))
 import Control.Applicative (Alternative(..))
 
 
@@ -46,8 +46,19 @@ instance Syntax tok (Parsing [tok] Maybe) where
                      []   -> Nothing)
 
 -- | Run 'Syntax' as @'Parser' tok@.
-runAsParser :: RunAsParser tok a ErrorString
+runAsParser :: RunAsParser tok a SyntaxError
 runAsParser parser s = case runParser parser s of
   Just (a, [])    -> Right a
-  Just (_, _:_) -> Left . errorString $ "Not the end of token stream."
-  Nothing         -> Left . errorString $ "parse error"
+  Just (_, _:_) -> Left . ErrorString $ "Not the end of token stream."
+  Nothing         -> Left . ErrorString $ "parse error"
+
+
+
+--synA :: (Eq t,Syntax t y) => y ()
+--synA = this 'a'
+
+--synB :: (Eq t ,Syntax t y) => y ()
+--synB = this 'b'
+
+go :: Either SyntaxError Char
+go = runAsParser ((element 'A' /$/ this 'a') /+/ (element 'B' /$/ this 'b')) "ab"

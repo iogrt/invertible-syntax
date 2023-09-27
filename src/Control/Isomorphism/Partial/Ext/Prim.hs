@@ -10,7 +10,7 @@
 -- This module contains utility combinators for @Control.Isomorphism.Partial@.
 
 module Control.Isomorphism.Partial.Ext.Prim (
-  iso, apply', unapply',
+  iso, 
   mayAppend',  (||?), mayAppend,
   mayPrepend', (?||), mayPrepend
   ) where
@@ -21,14 +21,6 @@ import Prelude hiding (id)
 import qualified Prelude as P
 import Control.Category (id)
 import Control.Isomorphism.Partial.Prim (inverse, apply, unapply, Iso(Iso))
-
--- | strict version of apply
-apply' :: Iso alpha beta -> alpha -> Maybe beta
-apply' iso' x = let z = apply iso' x in z `seq` z
-
--- | strict version of unapply
-unapply' :: Iso alpha beta -> beta -> Maybe alpha
-unapply' iso' = apply' (inverse iso')
 
 -- | Define a isomorphism from two pure functions.
 iso :: (a -> b) -> (b -> a) -> Iso a b

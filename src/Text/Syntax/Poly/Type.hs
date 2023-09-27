@@ -1,4 +1,5 @@
 {-# LANGUAGE Rank2Types #-}
+{-# LANGUAGE GADTs #-}
 
 -- |
 -- Module      : Text.Syntax.Poly.Type
@@ -16,8 +17,8 @@ module Text.Syntax.Poly.Type (
   -- * Type to run syntax as Parser \/ Printer.
   RunAsParser, RunAsParserM,
   RunAsPrinter, RunAsPrinterM,
-  -- * Error string type
-  ErrorString, errorString
+  -- * Error type
+  SyntaxError(..)
   ) where
 
 import Text.Syntax.Poly.Class (Syntax)
@@ -26,21 +27,24 @@ import Text.Syntax.Poly.Class (Syntax)
 type SyntaxT tok a = forall delta . Syntax tok delta => delta a
 
 -- | Type to run syntax as parser
-type RunAsParser     tok tks a e = SyntaxT tok a -> tks -> Either e a
+type RunAsParser     tok tks a e = SyntaxT tok a -> tks -> Either (e tok a) a
 -- | Same as 'RunAsParser' other than with computation @m@
-type RunAsParserM  m tok tks a e = SyntaxT tok a -> tks -> m (Either e a)
+type RunAsParserM  m tok tks a e = SyntaxT tok a -> tks -> m (Either (e tok a) a)
 
 -- | Type to run syntax as printer
-type RunAsPrinter    tok tks a e = SyntaxT tok a -> a   -> Either e tks
+type RunAsPrinter    tok tks a e = SyntaxT tok a -> a   -> Either (e tok a) tks
 -- | Same as 'RunAsPrinter' other than with computation @m@
-type RunAsPrinterM m tok tks a e = SyntaxT tok a -> a   -> m (Either e tks)
+type RunAsPrinterM m tok tks a e = SyntaxT tok a -> a   -> m (Either (e tok a) tks)
 
 -- | String type which is 'Show' instance not to show but just return String
-newtype ErrorString = ErrorString String
+-- alpha is unprocessed, beta is processed
+data SyntaxError a b where
+  ErrorString :: String -> SyntaxError a b
+  EndOfStream :: Show b => b -> SyntaxError a b
+  UnspecifiedError :: SyntaxError a b
 
--- | Construct 'ErrorString'
-errorString :: String -> ErrorString
-errorString =  ErrorString
-
-instance Show ErrorString where
-  show (ErrorString s) = s
+instance Show (SyntaxError a b) where
+  show s = show $ case s of
+    ErrorString s -> s
+    EndOfStream b -> "Reached the end of the token stream, partial proccessed: " ++ show b
+    UnspecifiedError -> "Unspecified error occured, use `syntaxError`"
