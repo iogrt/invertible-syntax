@@ -48,7 +48,7 @@ module Text.Syntax.Poly.Combinators (
 import Prelude hiding (foldl, succ, replicate, (.))
 import qualified Data.List.NonEmpty as NE
 
-import Control.Applicative ((<*>))
+import Control.Applicative ((<*>), empty)
 import Control.Isomorphism.Partial.Prim (Iso (Iso))
 import Control.Isomorphism.Partial.Ext
   (nothing, just, nil, cons, left, right, foldl,
@@ -56,7 +56,7 @@ import Control.Isomorphism.Partial.Ext
    mayAppend, mayPrepend, succ, iso)
 
 import Text.Syntax.Poly.Class
-  ((/*/), (/+/),AbstractSyntax(syntax), Syntax(token), empty)
+  ((/*/), (/+/),AbstractSyntax(syntax), Syntax(token), IsoAlternative(..))
 import Data.List.NonEmpty (NonEmpty(..))
 
 -- | 'none' parses\/prints empty tokens stream consume\/produces a empty list.
@@ -158,7 +158,7 @@ skipSome p = p /* skipMany p
 
 -- | 'choice' a syntax from list.
 choice :: AbstractSyntax delta => [delta alpha] -> delta alpha
-choice = foldr (/+/) empty
+choice = foldr (/+/) emptyIso
 
 -- | The 'optional' combinator may parse \/ print passed syntax.
 optional :: AbstractSyntax delta => delta alpha -> delta (Maybe alpha)

@@ -25,7 +25,7 @@ import Control.Monad.Fail (MonadFail(..))
 
 import Text.Syntax.Parser.Instances ()
 import Text.Syntax.Poly.Class
-  (TryAlternative, Syntax (token))
+  (Syntax (token))
 import Text.Syntax.Parser.List.Type (RunAsParser, ErrorString, errorString)
 import Control.Applicative (Alternative(..))
 
@@ -61,8 +61,7 @@ instance MonadPlus (Parser tok) where
                  Bad              -> Bad
                good@(Good !_ _)   -> good)
 
-instance TryAlternative (Parser tok)
-instance Alternative (Parser tok) where
+instance Alternative (Parser tok)
 
 instance Eq tok => Syntax tok (Parser tok) where
   token = Parser (\s -> case s of

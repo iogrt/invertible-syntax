@@ -26,7 +26,7 @@ import Control.Isomorphism.Partial (IsoFunctor ((/$/)), unapply)
 import Control.Applicative
 
 import Text.Syntax.Poly.Class
-  (ProductFunctor ((/*/)), TryAlternative, IsoAlternative(..),
+  (ProductFunctor ((/*/)), IsoAlternative(..),
    AbstractSyntax (syntax), Syntax (token))
 import Text.Syntax.Poly.Type (ErrorString, errorString)
 import qualified Text.Syntax.Poly.Type as T
@@ -58,13 +58,10 @@ instance Monoid tok => ProductFunctor (Printer tok) where
 
 -- | 'Alternative' instance for 'Printer'. Print first or second.
 instance IsoAlternative (Printer tok) where
-  Printer p <||> Printer q
+  Printer p /+/ Printer q
     -- it's mplus of function! wow...
     = Printer (\s -> mplus (p s) (q s))
-  empty = Printer (const Nothing)
-
--- | 'TryAlternative' instance for 'Printer'. Along with default definition.
-instance TryAlternative (Printer tok)
+  emptyIso = Printer (const Nothing)
 
 -- | 'AbstractSyntax' instance for 'Printer'. Match parsed result and success.
 instance Monoid tok => AbstractSyntax (Printer tok) where

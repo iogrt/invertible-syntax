@@ -21,3 +21,13 @@ Tweaks I intend on doing to this package:
 -- better invertiblesyntax typeclassings
 - https://blog.poisson.chat/posts/2016-10-18-typeclass-interface.html 
 -- why is lazyMaybe not implemented through the "naive" parser?
+
+
+
+- BIG VALUE CHANGE: Implement "list" operator in syntax, to allow performance gains and implementing "text" and "bytestring" parsers
+
+
+- no more imports as the deciding factor
+-- things like parser instances could be imported or not? nonsense. make the parsing type and define it like so!
+
+-- TryAlternative was deprecated. I don't think we'd ever want to have the possibility of "no-backtracking" being useful. So it's not.

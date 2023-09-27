@@ -18,6 +18,12 @@ library
                         Control.Isomorphism.Partial.Ext.Constructors
                         Control.Isomorphism.Partial.Ext.Data
                         Control.Isomorphism.Partial.Ext
+                        Control.Isomorphism.Partial
+                        Control.Isomorphism.Partial.Constructors
+                        Control.Isomorphism.Partial.Derived
+                        Control.Isomorphism.Partial.Prim
+                        Control.Isomorphism.Partial.TH
+
                         Text.Syntax.Poly.Class
                         Text.Syntax.Poly.Type
                         Text.Syntax.Poly.Instances
@@ -25,6 +31,7 @@ library
                         Text.Syntax.Poly.Combinators.Char
                         Text.Syntax.Poly
                         Text.Syntax.Parser.Instances
+                        Text.Syntax.Parser.Generic
                         Text.Syntax.Parser.List.Type
                         Text.Syntax.Parser.List.Compose
                         Text.Syntax.Parser.List.Lazy

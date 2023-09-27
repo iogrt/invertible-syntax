@@ -12,8 +12,7 @@
 -- This module contains type classes for invertible syntax.
 module Text.Syntax.Poly.Class (
   ProductFunctor((/*/)),
-  IsoAlternative((<||>), empty),
-  TryAlternative((/+/), try),
+  IsoAlternative(..),
   AbstractSyntax(syntax, syntaxError),
   Syntax(token)
   ) where
@@ -30,32 +29,21 @@ infixr 6 /*/
 -- | Monoid class for 'IsoFunctor'
 class IsoAlternative f where
   -- | like MonadPlus (mplus) or Alternative ((\<|\>))
-  (<||>) :: f alpha -> f alpha -> f alpha
-  empty  :: f alpha
-
--- | Support try for combinators which semantics is like Parsec
-class IsoAlternative f => TryAlternative f where
-  {- | This method should be implemented for combinators
-       which semantics is not full-backtracking like parsec.
-       ex. @try = Text.Parsec.try@ -}
-  try   :: f alpha -> f alpha
-  try   =  id
-  {- | This method should be implemented for combinators
-       which semantics is not full-backtracking like parsec.
-       ex. @p <|> q = try p <||> q@ -}
+  -- must be full backtracking. if not, implement a try function and declare this like so:
+  -- ex. @p <|> q = try p <||> q@ -}
   (/+/) :: f alpha -> f alpha -> f alpha
-  (/+/) = (<||>)
+  emptyIso  :: f alpha
 
-infixr 3 /+/, <||>
+infixr 3 /+/
 
 -- | Syntax abstraction.
 class (IsoFunctor delta, ProductFunctor delta,
-       IsoAlternative delta, TryAlternative delta)
+       IsoAlternative delta)
       => AbstractSyntax delta  where
   -- | Lift a value.
   syntax :: Eq alpha => alpha -> delta alpha
   syntaxError :: String -> delta alpha
-  syntaxError =  const empty
+  syntaxError =  const emptyIso
 
 -- | Syntax abstraction with token type @tok@.
 class AbstractSyntax delta => Syntax tok delta where

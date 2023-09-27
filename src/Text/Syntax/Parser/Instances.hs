@@ -1,6 +1,5 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE UndecidableInstances #-}
-
 -- |
 -- Module      : Text.Syntax.Parser.Instances
 -- Copyright   : 2012 Kei Hibino
@@ -18,6 +17,8 @@ import Control.Monad (MonadPlus (mzero))
 
 import Control.Isomorphism.Partial.Ext.Prim (apply')
 import Text.Syntax.Poly.Instances ()
+
+-- TODO: remove after! 
 
 -- | 'IsoFunctor' instance for parsers on 'MonadPlus' context
 instance MonadPlus m => IsoFunctor m where

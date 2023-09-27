@@ -26,7 +26,7 @@ import Control.Applicative(Alternative(..))
 import Text.Syntax.Parser.Instances ()
 import Text.Syntax.Poly.Instances ()
 import Text.Syntax.Poly.Class
-  (TryAlternative, Syntax (..))
+  (IsoAlternative, Syntax (..))
 import Text.Syntax.Parser.List.Type (RunAsParser, ErrorStack, errorString)
 
 -- | Naive 'Parser' type. Parse @[tok]@ into @alpha@.
@@ -53,7 +53,6 @@ instance MonadPlus (Parser tok) where
                Left e' -> runParser p2' s (e' ++ e)
                r1      -> r1)
 
-instance TryAlternative (Parser tok)
 
 instance Eq tok => Syntax tok (Parser tok) where
   token = Parser (\s e -> case s of

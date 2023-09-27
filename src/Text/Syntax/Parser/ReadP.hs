@@ -17,13 +17,10 @@ import Data.List (find)
 
 import Text.Syntax.Parser.Instances ()
 import Text.Syntax.Poly.Class
-  (TryAlternative, Syntax(token))
+  (IsoAlternative, Syntax(token))
 import Text.Syntax.Poly.Type (RunAsParser, ErrorString, errorString)
 
 import Text.ParserCombinators.ReadP (ReadP, get, readP_to_S)
-
--- | 'TryAlternative' instance of 'ReadP', method definitions is default.
-instance TryAlternative ReadP
 
 -- | 'Syntax' instance of 'Char' and 'ReadP'
 instance Syntax Char ReadP where

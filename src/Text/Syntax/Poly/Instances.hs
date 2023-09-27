@@ -21,7 +21,7 @@ import Control.Applicative (Alternative(..), liftA2)
 import Control.Isomorphism.Partial (IsoFunctor)
 import Text.Syntax.Poly.Class
   (ProductFunctor((/*/)),
-   IsoAlternative((<||>), empty), TryAlternative,
+   IsoAlternative(..),
    AbstractSyntax(syntax, syntaxError))
 
 -- | 'ProductFunctor' instance on 'Applicative' context
@@ -33,13 +33,13 @@ instance Applicative f => ProductFunctor f where
 -- | 'IsoAlternative' instance on 'MonadPlus' context
 -- which is a prerequisite for 'Syntax' definitions.
 instance Alternative m => IsoAlternative m where
-  (<||>) = (Applicative.<|>)
-  empty :: m alpha
-  empty  = Applicative.empty
+  (/+/) = (Applicative.<|>)
+  emptyIso :: m alpha
+  emptyIso  = Applicative.empty
 
 
 -- | 'AbstractSyntax' instance on 'MonadPlus' context
 -- which is a prerequisite for 'Syntax' definitions.
-instance (IsoFunctor m, Alternative m, TryAlternative m, MonadFail m) => AbstractSyntax m where
+instance (IsoFunctor m, Alternative m, IsoAlternative m, MonadFail m) => AbstractSyntax m where
   syntax = return
   syntaxError = fail
