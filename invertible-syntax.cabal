@@ -30,14 +30,9 @@ library
                         Text.Syntax.Poly.Combinators
                         Text.Syntax.Poly.Combinators.Char
                         Text.Syntax.Poly
-                        Text.Syntax.Parser.Instances
                         Text.Syntax.Parser.Generic
-                        Text.Syntax.Parser.List.Type
-                        Text.Syntax.Parser.List.Compose
-                        Text.Syntax.Parser.List.Lazy
-                        Text.Syntax.Parser.List.LazyMaybe
-                        Text.Syntax.Parser.List.Strict
-                        Text.Syntax.Parser.List.StrictMaybe
+                        Text.Syntax.Parser.List
+                        Text.Syntax.Parser.ListSilent
                         Text.Syntax.Printer.List
                         Text.Syntax.Check.Prim
   

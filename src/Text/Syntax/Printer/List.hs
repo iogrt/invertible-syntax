@@ -81,7 +81,7 @@ type RunAsPrinter tok a e = T.RunAsPrinter tok tok a e
 type RunAsStringPrinter a e = RunAsPrinter Char a e
 
 -- | Run 'Syntax' type as 'Printer'.
-runAsPrinter :: (Monoid tok,Eq tok) => RunAsPrinter tok a ErrorString
+runAsPrinter :: (Monoid tok,Eq tok) => RunAsPrinter tok a SyntaxError
 runAsPrinter printer = maybe (Left . ErrorString $ "print error") Right
                        . runPrinter printer
 

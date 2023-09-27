@@ -13,9 +13,7 @@
 -- Portability : unknown
 --
 -- This module includes a lazy parser implementation for "Text.Syntax.Poly".
-module Text.Syntax.Parser.List.Lazy (
-  -- * Syntax instance Parser type
-  Parser, runP , ErrorStack,
+module Text.Syntax.Parser.List (
   -- * Poly- morphic wrapper of runParser
   runAsParser
   ) where
@@ -24,13 +22,14 @@ import Control.Monad (MonadPlus(mzero, mplus))
 import Control.Monad.Fail (MonadFail(..))
 import Control.Applicative(Alternative(..))
 
+import Text.Syntax.Poly
 import Text.Syntax.Parser.Generic
 import Text.Syntax.Poly.Class
   (IsoAlternative, Syntax (..))
-import Text.Syntax.Parser.List.Type (RunAsParser, ErrorStack, ErrorString)
 
 newtype ErrorStacker a = ErrorStacker {
-    unErrorStacker :: Either [String] a
+    -- toks = remaining tokens when error occured
+    unErrorStacker :: Either [SyntaxError] a
   } --deriving (Functor,Applicative,Monad...)
 
 instance Functor ErrorStacker where -- implement with deriving pls
@@ -54,12 +53,14 @@ instance MonadPlus ErrorStacker where
 instance Syntax tok (Parsing [tok] ErrorStacker) where
   token = Parsing (\case
                      t:ts -> ErrorStacker $ Right (t, ts)
-                     []   -> ErrorStacker $ Left ["The end of token stream."])
+                     []   -> ErrorStacker $ Left [EndOfStream])
 
-runAsParser :: (Eq tok, Show tok, Show a) => RunAsParser tok a ErrorStack
-runAsParser parser s = case unErrorStacker <$> runParser parser s of
-  Right (a,[]) -> a
-  Right (a, _:s') -> Left $ "Not the end of token stream, tokens missing: " ++ show s'
-                ++ "\n\nand the content parsed:" ++ show a
-  Left [] -> Left $ "unspecified parse error (use syntaxError)"
-  Left x -> Left x
+runAsParser :: (Eq tok, Show tok, Show a) => RunAsParser tok [tok] a [SyntaxError]
+runAsParser parser s = 
+  case unErrorStacker $ runParser parser s of
+    Right (a,[]) -> Right a
+    -- TODO: extract this into general errorstacker printing, once errorstacker is generalized
+    Right (a, _:s') -> Left $ pure $ ErrorString $ "Not the end of token stream, tokens missing: " ++ show s'
+                  ++ "\n\nand the content parsed:" ++ show a
+    Left [] -> Left [UnspecifiedError]
+    Left x -> Left x 

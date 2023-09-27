@@ -157,7 +157,6 @@ This definition is runnable as both JSON parser and JSON printer.
 >   ((<|>), (<*>), syntax, syntaxError, token, SyntaxT,
 >    list, this, between, (*>), (<*), many, some, sepBy, replicate,
 >    choice, optSpace)
-> import Text.Syntax.Parser.List.Type (RunAsStringParser, SyntaxError, ErrorStack)
 > import Text.Syntax.Parser.List.Lazy (runAsParser)
 > import Text.Syntax.Printer.List (RunAsStringPrinter, runAsPrinter)
 > 

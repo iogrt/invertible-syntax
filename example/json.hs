@@ -12,8 +12,7 @@ import Text.Syntax.Poly
   ((<|>), (<*>), syntax, syntaxError, token, SyntaxT,
    list, this, between, (*>), (<*), many, some, sepBy, replicate,
    choice, optSpace)
-import Text.Syntax.Parser.List.Type (RunAsStringParser, SyntaxError, ErrorStack)
-import Text.Syntax.Parser.List.Lazy (runAsParser)
+import Text.Syntax.Parser.List (runAsParser)
 import Text.Syntax.Printer.List (RunAsStringPrinter, runAsPrinter)
 
 import System.Environment (getArgs)
@@ -127,10 +126,10 @@ s_unicode :: JSyntax Char
 s_unicode =  inverse chrOrd . hex <$> this 'u' *> replicate 4 s_hexdigit
 
 
-runStringParser :: RunAsStringParser a ErrorStack
+runStringParser :: RunAsStringParser a [SyntaxError]
 runStringParser =  runAsParser
 
-runStringPrinter :: RunAsStringPrinter a SyntaxError
+runStringPrinter :: RunAsStringPrinter a [SyntaxError]
 runStringPrinter =  runAsPrinter
 
 main :: IO ()

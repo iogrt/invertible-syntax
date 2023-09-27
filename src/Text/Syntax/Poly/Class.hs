@@ -43,7 +43,6 @@ class (IsoFunctor delta, ProductFunctor delta,
   -- | Lift a value.
   syntax :: Eq alpha => alpha -> delta alpha
   syntaxError :: String -> delta alpha
-  syntaxError =  const emptyIso
 
 -- | Syntax abstraction with token type @tok@.
 class AbstractSyntax delta => Syntax tok delta where

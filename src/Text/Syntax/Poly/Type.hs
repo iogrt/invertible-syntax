@@ -1,5 +1,4 @@
 {-# LANGUAGE Rank2Types #-}
-{-# LANGUAGE GADTs #-}
 
 -- |
 -- Module      : Text.Syntax.Poly.Type
@@ -27,24 +26,24 @@ import Text.Syntax.Poly.Class (Syntax)
 type SyntaxT tok a = forall delta . Syntax tok delta => delta a
 
 -- | Type to run syntax as parser
-type RunAsParser     tok tks a e = SyntaxT tok a -> tks -> Either (e tok a) a
+type RunAsParser     tok tks a e = SyntaxT tok a -> tks -> Either e a
 -- | Same as 'RunAsParser' other than with computation @m@
-type RunAsParserM  m tok tks a e = SyntaxT tok a -> tks -> m (Either (e tok a) a)
+type RunAsParserM  m tok tks a e = SyntaxT tok a -> tks -> m (Either e a)
 
 -- | Type to run syntax as printer
-type RunAsPrinter    tok tks a e = SyntaxT tok a -> a   -> Either (e tok a) tks
+type RunAsPrinter    tok tks a e = SyntaxT tok a -> a   -> Either e tks
 -- | Same as 'RunAsPrinter' other than with computation @m@
-type RunAsPrinterM m tok tks a e = SyntaxT tok a -> a   -> m (Either (e tok a) tks)
+type RunAsPrinterM m tok tks a e = SyntaxT tok a -> a   -> m (Either e tks)
 
 -- | String type which is 'Show' instance not to show but just return String
 -- alpha is unprocessed, beta is processed
-data SyntaxError a b where
-  ErrorString :: String -> SyntaxError a b
-  EndOfStream :: Show b => b -> SyntaxError a b
-  UnspecifiedError :: SyntaxError a b
+data SyntaxError =
+  ErrorString String 
+  | EndOfStream 
+  | UnspecifiedError 
 
-instance Show (SyntaxError a b) where
+instance Show SyntaxError where
   show s = show $ case s of
     ErrorString s -> s
-    EndOfStream b -> "Reached the end of the token stream, partial proccessed: " ++ show b
+    EndOfStream -> "Reached the end of the token stream"
     UnspecifiedError -> "Unspecified error occured, use `syntaxError`"
