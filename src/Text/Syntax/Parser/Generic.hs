@@ -15,28 +15,47 @@ import Control.Isomorphism.Partial.Ext
 import Text.Syntax.Poly.Class
 import Text.Syntax.Poly (AbstractSyntax)
 import Debug.Trace
+import Data.Maybe
 
 
 -- Parsing in a context p :: * -> *
-newtype Parsing p a = Parsing 
- { runParser :: p a } -- deriving (Functor, Applicative, Monad, Alternative, MonadPlus)
- --{ runParser :: forall p . MonadPlus p => p a } 
+-- inp :: input (token collection)
+-- rm:: result monoid (maybe, Either String, etc..)
+-- out :: result
+
+-- INP SHOULD BE A MONOID for shit to work accordingly!
+newtype Parsing inp out t = Parsing
+ { runParser :: inp -> out (t, inp)
+ }
 
 -- | 'IsoFunctor' instance for parsers on 'MonadPlus' context
-instance MonadPlus p => IsoFunctor (Parsing p) where
+-- TODO: More generic instance: instance Alternative out => IsoFunctor (Parsing Maybe inp) where
+  -- TODO: think it works? might need constraint
+instance MonadPlus out => IsoFunctor (Parsing inp out) where
   -- TODO: is apply' actually strict? I don't think so, hls tells me it's not
-  iso /$/ (Parsing mp) = Parsing (mp >>= maybe mzero return . apply' iso)
+  iso /$/ (Parsing mp) = Parsing (mp >=>
+      -- TODO: make sure it's working properly please!!!
+      firstM (maybe empty pure . apply' iso)
+    )
+    where
+      firstM :: Functor m => (a -> m a') -> (a, b) -> m (a', b)
+      firstM f ~(a,b) = (,b) <$> f a
 
-instance Applicative p => ProductFunctor (Parsing p) where
-  Parsing a /*/ Parsing b = Parsing (liftA2 (,) a b)
+instance Monad m => ProductFunctor (Parsing i m) where
+--  Parsing a /*/ Parsing b = Parsing (liftA2 (liftA2 (,)) a b)
+  -- Optimize this one somehow
+  Parsing a /*/ Parsing b = Parsing (a >=> \(aa,i) -> do
+    (bb,ii) <- b i
+    pure ((aa,bb), ii)
+    )
 
-instance Alternative p => IsoAlternative (Parsing p) where
-  emptyIso = Parsing empty
-  Parsing a /+/ Parsing a' = Parsing (a <|> a')
+instance Alternative m => IsoAlternative (Parsing i m) where
+  emptyIso = Parsing $ const empty
+  Parsing a /+/ Parsing a' = Parsing (liftA2 (<|>) a a')
 
 
-instance (MonadPlus p) => AbstractSyntax (Parsing p) where
-  syntax = Parsing . pure
+instance (Monoid i, MonadPlus m) => AbstractSyntax (Parsing i m) where
+  syntax x = Parsing $ const $ pure (x, mempty)
 
 -- hopes: make a Toki or Parser typeclass for a fine way to define token.
 -- that way you create parsers easy

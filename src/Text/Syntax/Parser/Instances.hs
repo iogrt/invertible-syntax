@@ -17,10 +17,17 @@ import Control.Monad (MonadPlus (mzero))
 
 import Control.Isomorphism.Partial.Ext.Prim (apply')
 import Text.Syntax.Poly.Instances ()
+import Control.Applicative
+import Text.Syntax.Poly
 
--- TODO: remove after! 
+-- Both useful instances for printers and parsers here
+-- Parser implementation needs:
+   -- MonadPlus and Syntax (token function)
+-- Printer implementation needs:
+  -- Monoid and Syntax (token function)
+-- TODO: nvm this is simply not possible because printing can be generalized but needs 
 
--- | 'IsoFunctor' instance for parsers on 'MonadPlus' context
+-- ALL OF THIS IS DEPRECATED, WILL BE IMPLEMENTED IN Generic for printer and parser for better safeties.
+
 instance MonadPlus m => IsoFunctor m where
-  iso /$/ mp = do a <- mp
-                  maybe mzero return $ apply' iso a
+  iso /$/ p = p >>= maybe mzero return . apply' iso
