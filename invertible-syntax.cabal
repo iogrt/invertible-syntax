@@ -26,17 +26,17 @@ library
 
                         Text.Syntax.Poly.Class
                         Text.Syntax.Poly.Type
-                        Text.Syntax.Poly.Instances
                         Text.Syntax.Poly.Combinators
                         Text.Syntax.Poly.Combinators.Char
                         Text.Syntax.Poly
                         Text.Syntax.Parser.Generic
                         Text.Syntax.Parser.List
                         Text.Syntax.Parser.ListSilent
+                        Text.Syntax.Parser.Text
                         Text.Syntax.Printer.List
                         Text.Syntax.Check.Prim
   
-  build-depends:        base < 5, template-haskell
+  build-depends:        base < 5, template-haskell, text
   
 
 source-repository head

@@ -31,3 +31,6 @@ Tweaks I intend on doing to this package:
 -- things like parser instances could be imported or not? nonsense. make the parsing type and define it like so!
 
 -- TryAlternative was deprecated. I don't think we'd ever want to have the possibility of "no-backtracking" being useful. So it's not.
+
+
+- make the "runAsParser" stuff just go to generic and be defined there, implemented everywhere like it is

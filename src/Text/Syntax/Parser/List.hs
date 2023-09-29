@@ -15,7 +15,8 @@
 -- This module includes a lazy parser implementation for "Text.Syntax.Poly".
 module Text.Syntax.Parser.List (
   -- * Poly- morphic wrapper of runParser
-  runAsParser
+  runAsParser,
+  ErrorStacker(..) -- temporary
   ) where
 
 import Control.Monad (MonadPlus(mzero, mplus))

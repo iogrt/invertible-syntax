@@ -10,8 +10,7 @@ module Text.Syntax.Parser.ListSilent (
   -- * Syntax instance Parser type
   runParser,
   -- * Poly- morphic wrapper of runParser
-  runAsParser,
-  go
+  runAsParser
   ) where
 
 import Control.Monad (MonadPlus(mzero, mplus))
@@ -41,13 +40,6 @@ runAsParser parser s = case runParser parser s of
   Just (_, _:_) -> Left . ErrorString $ "Not the end of token stream."
   Nothing         -> Left . ErrorString $ "parse error"
 
-
-
---synA :: (Eq t,Syntax t y) => y ()
---synA = this 'a'
-
---synB :: (Eq t ,Syntax t y) => y ()
---synB = this 'b'
-
-go :: Either SyntaxError Char
-go = runAsParser ((element 'A' /$/ this 'a') /+/ (element 'B' /$/ this 'b')) "ab"
+-- to test it out
+-- go :: Either SyntaxError Char
+--go = runAsParser ((element 'A' /$/ string 'a') /+/ (element 'B' /$/ this 'b')) "ab"

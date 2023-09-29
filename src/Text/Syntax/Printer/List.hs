@@ -27,7 +27,7 @@ import Control.Applicative
 
 import Text.Syntax.Poly.Class
   (ProductFunctor ((/*/)), IsoAlternative(..),
-   AbstractSyntax (syntax), Syntax (token))
+   AbstractSyntax (syntax), Syntax(..))
 import Text.Syntax.Poly.Type (SyntaxError(..))
 import qualified Text.Syntax.Poly.Type as T
 import Control.Monad.Fail (MonadFail)
@@ -71,8 +71,8 @@ instance Monoid tok => AbstractSyntax (Printer tok) where
 
 -- | 'Syntax' instance for 'Printer'. Print token into singleton.
 instance (Eq tok,Monoid tok) => Syntax tok (Printer tok) where
-  -- TODO: Might need to do the pureprinting Eq guard?
   token  = Printer Just
+  string s = Printer (const $ Just s)
 
 -- | Specialized 'RunAsPrinter' type into list.
 type RunAsPrinter tok a e = T.RunAsPrinter tok tok a e
