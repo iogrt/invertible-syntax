@@ -28,8 +28,7 @@ import Control.Applicative
 import Text.Syntax.Poly.Class
   (ProductFunctor ((/*/)), IsoAlternative(..),
    AbstractSyntax (syntax), Syntax(..))
-import Text.Syntax.Poly.Type (SyntaxError(..))
-import qualified Text.Syntax.Poly.Type as T
+import Text.Syntax.Poly.Type
 import Control.Monad.Fail (MonadFail)
 import Control.Monad ((>=>),liftM2,mplus)
 
@@ -74,14 +73,11 @@ instance (Eq tok,Monoid tok) => Syntax tok (Printer tok) where
   token  = Printer Just
   string s = Printer (const $ Just s)
 
--- | Specialized 'RunAsPrinter' type into list.
-type RunAsPrinter tok a e = T.RunAsPrinter tok tok a e
 
 -- | Specialized 'RunAsPrinter' type into 'String'.
-type RunAsStringPrinter a e = RunAsPrinter Char a e
+type RunAsStringPrinter a e = RunAsPrinter String String a e
 
 -- | Run 'Syntax' type as 'Printer'.
-runAsPrinter :: (Monoid tok,Eq tok) => RunAsPrinter tok a SyntaxError
+runAsPrinter :: (Monoid tok,Eq tok) => RunAsPrinter tok tok a SyntaxError
 runAsPrinter printer = maybe (Left . ErrorString $ "print error") Right
                        . runPrinter printer
-
