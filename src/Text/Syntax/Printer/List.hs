@@ -76,6 +76,6 @@ instance Syntax tok (Printer tok) where
 type RunAsStringPrinter a e = RunAsPrinter Char String a e
 
 -- | Run 'Syntax' type as 'Printer'.
-runAsPrinter :: (Monoid tok,Eq tok) => RunAsPrinter tok [tok] a SyntaxError
+runAsPrinter :: Eq tok => RunAsPrinter tok [tok] a SyntaxError
 runAsPrinter printer = maybe (Left . ErrorString $ "print error") Right
                        . runPrinter printer
