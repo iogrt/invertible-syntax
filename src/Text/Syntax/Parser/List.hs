@@ -53,12 +53,12 @@ instance MonadPlus ErrorStacker where
 
 
 -- TODO: could be done as a for some kind of foldable class? would a tuple be able to be processed?
-instance Syntax [tok] (Parsing [tok] ErrorStacker) where
+instance Syntax tok (Parsing [tok] ErrorStacker) where
   token = Parsing (\case
-                     t:ts -> ErrorStacker $ Right ([t], ts)
+                     t:ts -> ErrorStacker $ Right (t, ts)
                      []   -> ErrorStacker $ Left [EndOfStream])
 
-runAsParser :: (Eq tok, Show tok, Show a) => RunAsParser [tok] [tok] a [SyntaxError]
+runAsParser :: (Eq tok, Show tok, Show a) => RunAsParser tok [tok] a [SyntaxError]
 runAsParser parser s = 
   case unErrorStacker $ runParser parser s of
     Right (a,[]) -> Right a

@@ -32,16 +32,15 @@ import Text.Syntax.Poly.Type
 import Control.Monad.Fail (MonadFail)
 import Control.Monad ((>=>),liftM2,mplus)
 
--- | Naive 'Printer' type. Print @alpha@ into @tok@.
--- | NEW PAPER: not list. anything monoidal!
+-- List specific. TODO: make the generic one like Parsing is
 newtype Printer tok alpha =
   Printer {
     -- | Function to run printer
-    runPrinter :: alpha -> Maybe tok
+    runPrinter :: alpha -> Maybe [tok]
     }
 
 -- Expect print side effect.
-printM :: MonadFail m => Printer tok alpha -> alpha -> m tok
+printM :: MonadFail m => Printer tok alpha -> alpha -> m [tok]
 printM p x = maybe (fail "print error") return $ runPrinter p x
 
 -- | 'IsoFunctor' instance for 'Printer'. Unapplying 'Iso' and print.
@@ -50,8 +49,7 @@ instance IsoFunctor (Printer tok) where
     = Printer (unapply iso >=> p)
 
 -- | 'ProductFunctor' instance for 'Printer'. Just print sequential.
--- ACCORDING TO NEW PAPER!
-instance Monoid tok => ProductFunctor (Printer tok) where
+instance ProductFunctor (Printer tok) where
   Printer p /*/ Printer q
     = Printer (\(x, y) -> p x <> q y)
 
@@ -63,21 +61,19 @@ instance IsoAlternative (Printer tok) where
   emptyIso = Printer (const Nothing)
 
 -- | 'AbstractSyntax' instance for 'Printer'. Match parsed result and success.
-instance Monoid tok => AbstractSyntax (Printer tok) where
+instance AbstractSyntax (Printer tok) where
   syntax x = Printer (\y ->  if x == y
-                             then Just mempty
+                             then Just [] 
                              else Nothing)
 
 -- | 'Syntax' instance for 'Printer'. Print token into singleton.
-instance (Eq tok,Monoid tok) => Syntax tok (Printer tok) where
-  token  = Printer Just
-  string s = Printer (const $ Just s)
-
+instance Syntax tok (Printer tok) where
+  token  = Printer (\x -> Just [x])
 
 -- | Specialized 'RunAsPrinter' type into 'String'.
-type RunAsStringPrinter a e = RunAsPrinter String String a e
+type RunAsStringPrinter a e = RunAsPrinter Char String a e
 
 -- | Run 'Syntax' type as 'Printer'.
-runAsPrinter :: (Monoid tok,Eq tok) => RunAsPrinter tok tok a SyntaxError
+runAsPrinter :: (Monoid tok,Eq tok) => RunAsPrinter tok [tok] a SyntaxError
 runAsPrinter printer = maybe (Left . ErrorString $ "print error") Right
                        . runPrinter printer

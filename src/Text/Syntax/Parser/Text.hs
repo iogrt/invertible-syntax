@@ -32,13 +32,13 @@ import Text.Syntax.Poly.Class
 import Text.Syntax.Parser.List(ErrorStacker(..))
 import Data.Bool
 
-
+{-
 instance Syntax T.Text (Parsing T.Text ErrorStacker) where
   -- kinda inneficient for single tokens, because I'm giving preference to string
   token = Parsing (ErrorStacker . maybe (Left [EndOfStream]) (Right . first T.singleton) . T.uncons)
-  string s = Parsing (\text ->
+   string s = Parsing (\text ->
         maybe 
             (ErrorStacker $ Left $ pure $ ErrorString $ "expected '" <> show s <> "', got "<>show text)
             (\rest -> pure ((),rest))
             (s `T.stripPrefix` text)
-    )
+    ) -}

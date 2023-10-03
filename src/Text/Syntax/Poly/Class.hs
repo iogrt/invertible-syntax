@@ -48,5 +48,3 @@ class (IsoFunctor delta, ProductFunctor delta,
 class AbstractSyntax delta => Syntax tok delta where
   -- | Get a token from stream.
   token :: delta tok
-  -- | Check if stream has string of tokens. much more efficienct than looping at the syntax level
-  string :: tok -> delta ()

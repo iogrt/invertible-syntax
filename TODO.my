@@ -34,3 +34,24 @@ Tweaks I intend on doing to this package:
 
 
 - make the "runAsParser" stuff just go to generic and be defined there, implemented everywhere like it is
+
+
+
+Cool and all but by using string you've just broken the "this" function. Which is pretty essential.
+This doesn't work for multi tokens... And I think I should make everything work for multi-tokens and disregard the single token case
+
+I think switching fom "token" function, to the attoparsec functions is the right call:
+- string :: a -> delta () (try consume characters/ print those characters)
+-- TODO: here Char could be stripped out, but since it's common in String and Text... I'll keep it for now...
+- takeWhile :: (Char -> Bool) -> delta a (take while pred doesn't fail. Printer would take )(would substitute the "subset" usage which is akward currently)
+  -? how would the printer work here???, anyways this is jut manyUntil
+
+Hold on, since I'm not selling on not using token type anymore, since attoparsec still uses Word8... maybe I'll keep token
+hardcoded to char for now?
+- token :: Char 
+
+
+
+-- New todos:
+- figure out how "string" addon would work
+- figure out how syntaxError should be better encoded into the types. Probably not leave it to monadfail
