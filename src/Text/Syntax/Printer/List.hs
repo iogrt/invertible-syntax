@@ -27,7 +27,7 @@ import Control.Applicative
 
 import Text.Syntax.Poly.Class
   (ProductFunctor ((/*/)), IsoAlternative(..),
-   AbstractSyntax (syntax), Syntax(..))
+   AbstractSyntax (..), Syntax(..))
 import Text.Syntax.Poly.Type
 import Control.Monad.Fail (MonadFail)
 import Control.Monad ((>=>),liftM2,mplus)
@@ -65,6 +65,8 @@ instance AbstractSyntax (Printer tok) where
   syntax x = Printer (\y ->  if x == y
                              then Just [] 
                              else Nothing)
+  -- TODO: Better encoding of errors
+  syntaxError s = error s
 
 -- | 'Syntax' instance for 'Printer'. Print token into singleton.
 instance Syntax tok (Printer tok) where

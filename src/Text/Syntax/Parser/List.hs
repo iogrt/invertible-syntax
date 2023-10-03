@@ -3,6 +3,7 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE GeneralisedNewtypeDeriving #-}
 
 -- |
 -- Module      : Text.Syntax.Parser.List.Lazy
@@ -32,14 +33,7 @@ import Text.Syntax.Poly.Class
 newtype ErrorStacker a = ErrorStacker {
     -- toks = remaining tokens when error occured
     unErrorStacker :: Either [SyntaxError] a
-  } --deriving (Functor,Applicative,Monad...)
-
-instance Functor ErrorStacker where -- implement with deriving pls
-instance Applicative ErrorStacker where -- implement
-instance Monad ErrorStacker where
-  ErrorStacker a >>= fb = case a of
-    Right r -> fb r
-    Left l -> ErrorStacker $ Left l
+  } deriving (Functor,Applicative,Monad)
 
 instance Alternative ErrorStacker where
   empty = ErrorStacker $ Left []

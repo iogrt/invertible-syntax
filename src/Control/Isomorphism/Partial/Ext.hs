@@ -18,7 +18,6 @@ module Control.Isomorphism.Partial.Ext (
   module Control.Isomorphism.Partial.Ext.Prim,
   module Control.Isomorphism.Partial.Ext.Constructors,
   module Control.Isomorphism.Partial.Ext.Data,
-  (/$/)
   ) where
 
 import Control.Isomorphism.Partial

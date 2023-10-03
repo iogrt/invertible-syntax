@@ -52,6 +52,8 @@ instance Alternative m => IsoAlternative (Parsing i m) where
 
 instance (Monoid i, MonadPlus m) => AbstractSyntax (Parsing i m) where
   syntax x = Parsing $ const $ pure (x, mempty)
+  -- better, probably not generic. error handling
+  syntaxError = error
 
 
 
