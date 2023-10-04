@@ -13,7 +13,7 @@
 module Text.Syntax.Poly.Class (
   ProductFunctor((/*/)),
   IsoAlternative(..),
-  AbstractSyntax(syntax, syntaxError),
+  AbstractSyntax(..),
   Syntax(..)
   ) where
 

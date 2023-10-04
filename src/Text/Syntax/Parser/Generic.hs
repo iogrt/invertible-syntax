@@ -35,14 +35,17 @@ instance MonadPlus out => IsoFunctor (Parsing inp out) where
   iso /$/ (Parsing mp) = Parsing (mp >=> firstM (maybe empty pure . apply iso))
     where
       firstM :: Functor m => (a -> m a') -> (a, b) -> m (a', b)
-      firstM f ~(a,b) = (,b) <$> f a
+      firstM f (a,b) = (,b) <$> f a
 
 instance Monad m => ProductFunctor (Parsing i m) where
 --  Parsing a /*/ Parsing b = Parsing (liftA2 (liftA2 (,)) a b)
   -- Optimize this one somehow
-  Parsing a /*/ Parsing b = Parsing (a >=> \(aa,i) -> do
-    (bb,ii) <- b i
-    pure ((aa,bb), ii)
+
+  -- TODO: This is not correct at all! Look at how /* will consume inputs aswell, making this a non-backtrabacle operation!
+  Parsing a /*/ Parsing b = Parsing (\i -> do
+    (aa,ii) <- a i
+    (bb,iii) <- b ii
+    pure ((aa,bb), iii)
     )
 
 instance Alternative m => IsoAlternative (Parsing i m) where
@@ -50,11 +53,13 @@ instance Alternative m => IsoAlternative (Parsing i m) where
   Parsing a /+/ Parsing a' = Parsing (liftA2 (<|>) a a')
 
 
-instance (Monoid i, MonadPlus m) => AbstractSyntax (Parsing i m) where
-  syntax x = Parsing $ const $ pure (x, mempty)
-  -- better, probably not generic. error handling
+instance (MonadPlus m) => AbstractSyntax (Parsing i m) where
+  syntax x = Parsing (\inp -> pure (x, inp))
+  -- 
+  --TODO: Non-generic, better way of using syntax Error, will have to somehow pass it in through probably a different typeclass!
+  -- Maybe "Parsing" is a typeclass itself, and then all Parsing's get transformed into the other
+  -- like class Parsing where (token,syntaxError)
   syntaxError = error
-
 
 
 -- Parser composition TODO. Look in old "Compose.hs" for reference

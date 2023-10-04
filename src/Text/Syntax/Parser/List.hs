@@ -36,13 +36,12 @@ newtype ErrorStacker a = ErrorStacker {
   } deriving (Functor,Applicative,Monad)
 
 instance Alternative ErrorStacker where
-  empty = ErrorStacker $ Left []
+  empty = ErrorStacker $ Left [ErrorString "debug: using empty"]
   ErrorStacker ea <|> ErrorStacker eb = case (ea,eb) of
     -- TODO: make this less verbose, make sure tests stay ok
     (Left a, Left b) -> ErrorStacker $ Left (a<>b)
-    (Right r, Left b) -> ErrorStacker (Right r)
+    (Left a, r) -> ErrorStacker r
     (Right r, _) -> ErrorStacker (Right r)
-    (Left a, Right r) -> ErrorStacker (Right r)
 
 instance MonadPlus ErrorStacker where
   mzero = empty

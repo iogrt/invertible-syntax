@@ -56,7 +56,7 @@ import Control.Isomorphism.Partial.Ext
    mayAppend, mayPrepend, succ, iso)
 
 import Text.Syntax.Poly.Class
-  ((/*/), (/+/),AbstractSyntax(syntax), Syntax(token), IsoAlternative(..))
+  ((/*/), (/+/),AbstractSyntax(..), Syntax(..), IsoAlternative(..))
 import Data.List.NonEmpty (NonEmpty(..))
 
 -- | 'none' parses\/prints empty tokens stream consume\/produces a empty list.
@@ -206,9 +206,22 @@ format tks = ignore (Just ()) /$/ optional (list tks)
 -- isoFail False so it doesn't print
 -- implementation: run op with bool to see if it succeeded or not,
 -- giving the success to isoFail, meaning that success will invert into failure
-notFollowedBy :: (AbstractSyntax delta) => delta () -> delta ()
-notFollowedBy op = inverse (isoFail False id) /$/ bool op
+--notFollowedBy :: (AbstractSyntax delta) => delta () -> delta ()
+--notFollowedBy op = inverse (isoFail False id) /$/ bool op
 
+notFollowedBy :: (AbstractSyntax delta) => delta () -> delta ()
+notFollowedBy op =
+  -- better error message
+  op */ syntaxError "nope" /+/ syntax ()
+{-
+notFollowedBy op = f /$/ bool op
+  where f = Iso 
+          (\succeeded -> if succeeded then Nothing else Just ()) 
+          -- because you never want to print what you put in op
+          -- Shouldn't it be Nothing??
+          (const $ Just False)
+
+-}
 
 nonEmptyIso = iso NE.fromList NE.toList
 

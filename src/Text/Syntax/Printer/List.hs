@@ -65,9 +65,7 @@ instance AbstractSyntax (Printer tok) where
   syntax x = Printer (\y ->  if x == y
                              then Just [] 
                              else Nothing)
-  -- TODO: Better encoding of errors
-  syntaxError s = error s
-
+  syntaxError s = Printer (const Nothing)
 -- | 'Syntax' instance for 'Printer'. Print token into singleton.
 instance Syntax tok (Printer tok) where
   token  = Printer (\x -> Just [x])
