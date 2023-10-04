@@ -38,8 +38,11 @@ newtype ErrorStacker a = ErrorStacker {
 instance Alternative ErrorStacker where
   empty = ErrorStacker $ Left []
   ErrorStacker ea <|> ErrorStacker eb = case (ea,eb) of
+    -- TODO: make this less verbose, make sure tests stay ok
     (Left a, Left b) -> ErrorStacker $ Left (a<>b)
-    (_, r) -> ErrorStacker r
+    (Right r, Left b) -> ErrorStacker (Right r)
+    (Right r, _) -> ErrorStacker (Right r)
+    (Left a, Right r) -> ErrorStacker (Right r)
 
 instance MonadPlus ErrorStacker where
   mzero = empty

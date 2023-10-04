@@ -39,7 +39,3 @@ runAsParser parser s = case runParser parser s of
   Just (a, [])    -> Right a
   Just (_, _:_) -> Left . ErrorString $ "Not the end of token stream."
   Nothing         -> Left . ErrorString $ "parse error"
-
--- to test it out
--- go :: Either SyntaxError Char
---go = runAsParser ((element 'A' /$/ string 'a') /+/ (element 'B' /$/ this 'b')) "ab"

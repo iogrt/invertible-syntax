@@ -41,6 +41,7 @@ data SyntaxError =
   ErrorString String 
   | EndOfStream 
   | UnspecifiedError 
+  deriving Eq
 
 instance Show SyntaxError where
   show s = show $ case s of

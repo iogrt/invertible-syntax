@@ -76,6 +76,7 @@ many p = some p /+/ none
 some :: AbstractSyntax delta => delta alpha -> delta [alpha]
 some p = cons /$/ p /*/ many p
 
+-- TIP: Use inverse unit /$/ manyUntil ... to ignore synEnd
 manyUntil :: AbstractSyntax delta => delta a -> delta b -> delta ([a],b)
 manyUntil synGo synEnd = go where
   go = (Iso (Just . ([],)) (\(as,b) -> case as of

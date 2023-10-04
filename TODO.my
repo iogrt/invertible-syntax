@@ -55,3 +55,4 @@ hardcoded to char for now?
 -- New todos:
 - figure out how "string" addon would work
 - figure out how syntaxError should be better encoded into the types. Probably not leave it to monadfail
+- Disable hoogle that shits expensive here in the papel flake
