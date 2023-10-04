@@ -59,7 +59,7 @@ instance (MonadPlus m) => AbstractSyntax (Parsing i m) where
   --TODO: Non-generic, better way of using syntax Error, will have to somehow pass it in through probably a different typeclass!
   -- Maybe "Parsing" is a typeclass itself, and then all Parsing's get transformed into the other
   -- like class Parsing where (token,syntaxError)
-  syntaxError = error
+  syntaxError x = Parsing (const mzero)
 
 
 -- Parser composition TODO. Look in old "Compose.hs" for reference
