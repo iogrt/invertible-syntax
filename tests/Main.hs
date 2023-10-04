@@ -91,7 +91,8 @@ tests = TestList
 
     , TestLabel "productFunctor discard" $ mkParseTest productFunctorDiscardSyn "aA" ()
     , TestLabel "productFunctorDiscardPrefixSyn" $ mkParseTest productFunctorDiscardPrefixSyn "aA" 'A'
-    , TestLabel "notFollowedBy" $ mkParseTest notFollowedBySyn "B" 'B' -- clearly shouldn't work
+    --  TODO: mkFailingParseTest
+    --, TestLabel "notFollowedBy" $ mkParseTest notFollowedBySyn "a" 'B' -- clearly shouldn't work. It consumes 'a' !!!
     , TestLabel "notFollowedBy2" $ mkParseTest notFollowedBySyn "C" 'C'
     , TestLabel "bool operator true" $ mkParseTest boolSyn "A" True
     , TestLabel "bool operator false" $ mkParseTest boolSyn "" False
