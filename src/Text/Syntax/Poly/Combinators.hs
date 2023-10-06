@@ -210,13 +210,7 @@ format tks = ignore (Just ()) /$/ optional (list tks)
 --notFollowedBy op = inverse (isoFail False id) /$/ bool op
 
 notFollowedBy :: (AbstractSyntax delta) => delta () -> delta ()
-notFollowedBy op = f /$/ bool op
-  where f = Iso 
-          -- TODO: can i put error messages here? by somehow adding syntaxError to the equation
-          (\succeeded -> if succeeded then Nothing else Just ()) 
-          -- because you never want to print what you put in op
-          -- Shouldn't it be Nothing??
-          (const $ Just False)
+notFollowedBy op = inverse (element False) /$/ bool op
 
 nonEmptyIso = iso NE.fromList NE.toList
 
