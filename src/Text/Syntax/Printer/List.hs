@@ -51,13 +51,13 @@ instance IsoFunctor (Printer tok) where
 -- | 'ProductFunctor' instance for 'Printer'. Just print sequential.
 instance ProductFunctor (Printer tok) where
   Printer p /*/ Printer q
-    = Printer (\(x, y) -> p x <> q y)
+    = Printer (\(x, y) -> liftA2 (<>) (p x) (q y))
 
 -- | 'Alternative' instance for 'Printer'. Print first or second.
 instance IsoAlternative (Printer tok) where
   Printer p /+/ Printer q
     -- it's mplus of function! wow...
-    = Printer (\s -> mplus (p s) (q s))
+    = Printer (\s -> p s <|> q s)
   emptyIso = Printer (const Nothing)
 
 -- | 'AbstractSyntax' instance for 'Printer'. Match parsed result and success.

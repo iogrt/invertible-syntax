@@ -13,6 +13,7 @@ import Text.Syntax.Printer.List (runAsPrinter)
 import Prelude hiding ((.))
 import Test.HUnit
 import qualified System.Exit as Exit
+import Data.Bifunctor
 
 type DocSyntax a = SyntaxT Char a
 
@@ -71,12 +72,28 @@ boolSyn = bool (this 'A')
 
 
 mkParseTest :: (Eq a,Show a) => SyntaxT Char a -> String -> a -> Test
-mkParseTest syn input result = TestCase (assertEqual "should parse" (Right result) (runAsParser syn input))
+mkParseTest syn input result = 
+    TestList 
+    [ TestCase (assertEqual "should parse" (Right result) (runAsParser syn input))
+    -- parse + print + parse should equal first parse
+    , TestCase (assertEqual "should parse print parse" (Right result) (
+        let 
+            printer :: RunAsPrinter Char String a SyntaxError
+            printer = runAsPrinter
+        in
+        runAsParser syn input >>= first (:[ErrorString "test: print error"]) . printer syn >>= runAsParser syn
+    ))
+    ]
+
+
+mkPrintTest :: (Eq a,Show a) => SyntaxT Char a -> String -> a -> Test
+mkPrintTest syn result input = TestCase (assertEqual "should print" (Right result) (runAsPrinter syn input))
 
 tests :: Test
 tests = TestList
     [ TestLabel "singleTokenTest" $ mkParseTest singleTokenSyn "H" 'H'
     , TestLabel "isoFunctoredTest" $ mkParseTest isoFunctoredSyn "H" (Just 'H')
+
 
     , TestLabel "isoFunctoredBacktrackTest" $ mkParseTest isoFunctorBacktrackingSyn "A" (Just 'A')
     , TestLabel "isoFunctoredBacktrackTest" $ mkParseTest isoFunctorBacktrackingSyn "B" (Just 'B')
@@ -95,6 +112,8 @@ tests = TestList
     --, TestLabel "notFollowedBy" $ mkParseTest notFollowedBySyn "a" 'B' -- clearly shouldn't work. It consumes 'a' !!!
     , TestLabel "notFollowedBy2" $ mkParseTest notFollowedBySyn "C" 'C'
     , TestLabel "bool operator true" $ mkParseTest boolSyn "A" True
+    ,TestLabel " syntax print" $ mkPrintTest syntaxSyn "" 10
+
     , TestLabel "bool operator false" $ mkParseTest boolSyn "" False
     --, TestLabel "isoFail syn" $ mkParseTest isoFailSyn "A" 'A'
     ]
@@ -103,10 +122,3 @@ main :: IO ()
 main = do
     result <- runTestTT tests
     if failures result > 0 then Exit.exitFailure else Exit.exitSuccess
-
--- OK THE ISSUE IS:
--- NOTFOLLOWEDBY SUCCEEDS! But it succeeds by giving the runparser stuff the input: [], meaning it clears all input stream somehow!
--- isoapplicative then takes that and ofc. cant do shit
-
--- BECAUSE: When you error out you effectively clear the input stream.
--- AND WHY: does the isofunctor stuff effectively clear it? what clears it?
