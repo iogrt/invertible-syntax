@@ -60,8 +60,8 @@ replicate n' p = rec n' where
         | otherwise = cons /$/ p /*/ rec (n - 1)
 
 
-either :: AbstractSyntax delta => delta alpha -> delta beta -> delta (Either alpha beta)
-either p q = (left /$/ p) /+/ (right /$/ q)
+eitherIso :: AbstractSyntax delta => delta alpha -> delta beta -> delta (Either alpha beta)
+eitherIso p q = (left /$/ p) /+/ (right /$/ q)
 
 -- | The 'this' combinator parses\/prints a fixed token
 this :: (Syntax tok delta, Eq tok) => tok -> delta ()

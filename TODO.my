@@ -61,6 +61,7 @@ hardcoded to char for now?
 
 
 -- should get some convention for counterpart combinators that return input vs not returning, then build a list operator that does.
+    -- should also make convention for things like cons that have a base operator, on what the naming is for the iso version. Possibly consI, eitherI etc?
 
 
 - TODO: someUntil tests!!!
