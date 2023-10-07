@@ -1,5 +1,4 @@
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE TupleSections #-}
 
 -- |
 -- Module      : Text.Syntax.Poly.Combinators
@@ -11,39 +10,7 @@
 -- Portability : unknown
 --
 -- This module contains combinators for classes defined in "Text.Syntax.Poly.Classes".
-module Text.Syntax.Poly.Combinators (
-  -- * Lexemes
-  this,
-  list,
-  -- * Repetition
-  none,
-  many,
-  some,
-  replicate,
-  sepBy, sepBy1,
-  chainl1,
-  count,
-  -- * Skipping
-  skipMany,
-  skipSome,
-  -- * Sequencing
-  (*/),
-  (/*),
-  between,
-  -- * Alternation
-  choice,
-  optional, optional_ , bool,
-  (/$?/), (/?$/),
-  -- * Printing
-  format,
-  -- others
-  isoFail,
-  notFollowedBy,
-  nonEmptyIso,
-  someNE,
-  manyUntil,
-  someUntil
-  ) where
+module Text.Syntax.Poly.Combinators where
 
 import Prelude hiding (foldl, succ, replicate, (.))
 import qualified Data.List.NonEmpty as NE
@@ -76,21 +43,13 @@ many p = some p /+/ none
 some :: AbstractSyntax delta => delta alpha -> delta [alpha]
 some p = cons /$/ p /*/ many p
 
--- TIP: Use inverse unit /$/ manyUntil ... to ignore synEnd
-manyUntil :: AbstractSyntax delta => delta a -> delta b -> delta ([a],b)
+manyUntil:: (Eq a ,AbstractSyntax delta) => delta a -> delta () -> delta [a]
 manyUntil synGo synEnd = go where
-  go = (Iso (Just . ([],)) (\(as,b) -> case as of
-      [] -> Just b
-      a : as' -> Nothing
-    ) /$/ synEnd)
-    /+/ (iso (\(a,(as,b)) -> (a:as,b)) (\(a:as,b) -> (a,(as,b))) /$/ synGo /*/ go)
+  go = (notFollowedBy synEnd */ (cons /$/ (synGo /*/ go))) /+/ syntax []
 
-someUntil :: AbstractSyntax delta => delta a -> delta b -> delta (NonEmpty a,b)
+someUntil :: (Eq a, AbstractSyntax delta) => delta a -> delta () -> delta (NonEmpty a)
 someUntil synGo synEnd =
-  iso
-    (\(a,(as,b)) -> (a:|as,b))
-    (\(a:|as,b) -> (a,(as,b)))
-    /$/ synGo /*/ manyUntil synGo synEnd
+  nonEmptyIso . cons /$/ synGo /*/ manyUntil synGo synEnd
 
 -- | The 'replicate' combinator is used to repeat syntax.
 -- @replicate n p@ repeats the passwd syntax @p@

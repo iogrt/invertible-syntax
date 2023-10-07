@@ -24,7 +24,9 @@ data Document = Document {
 $(defineIsomorphisms ''Document)
 
 docSyn :: SyntaxT Char Document
-docSyn = document . inverse unit /$/ (this '#' */ manyUntil token (this '\n'))
+docSyn = document /$/ (this '#' */ manyUntil token (this '\n'))
+    -- consume remaining token
+    /* this '\n'
 
 
 singleTokenSyn :: SyntaxT Char Char
@@ -60,6 +62,12 @@ productFunctorDiscardPrefixSyn = this 'a' */ token
 
 notFollowedBySyn :: SyntaxT Char Char
 notFollowedBySyn = notFollowedBy (this 'a') */ token
+
+manyUntilSyn :: SyntaxT Char String
+manyUntilSyn = 
+    manyUntil token (this 'b') 
+    -- consume the missing token
+      /* this 'b'
 
 isoFailSyn :: SyntaxT Char Char
 isoFailSyn =
@@ -115,6 +123,10 @@ tests = TestList
     ,TestLabel " syntax print" $ mkPrintTest syntaxSyn "" 10
 
     , TestLabel "bool operator false" $ mkParseTest boolSyn "" False
+
+
+    , TestLabel "manyUntil string" $ mkParseTest manyUntilSyn "AABBCCb" "AABBCC"
+    , TestLabel "manyUntil empty" $ mkParseTest manyUntilSyn "b" ""
     --, TestLabel "isoFail syn" $ mkParseTest isoFailSyn "A" 'A'
     ]
 
