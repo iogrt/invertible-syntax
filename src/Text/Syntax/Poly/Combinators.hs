@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TupleSections #-}
 
 -- |
 -- Module      : Text.Syntax.Poly.Combinators
@@ -43,13 +44,33 @@ many p = some p /+/ none
 some :: AbstractSyntax delta => delta alpha -> delta [alpha]
 some p = cons /$/ p /*/ many p
 
-manyUntil:: (Eq a ,AbstractSyntax delta) => delta a -> delta () -> delta [a]
-manyUntil synGo synEnd = go where
+manyUntil_ :: (Eq a ,AbstractSyntax delta) => delta a -> delta () -> delta [a]
+manyUntil_ synGo synEnd = go where
   go = (notFollowedBy synEnd */ (cons /$/ (synGo /*/ go))) /+/ syntax []
 
-someUntil :: (Eq a, AbstractSyntax delta) => delta a -> delta () -> delta (NonEmpty a)
+someUntil_ :: (Eq a, AbstractSyntax delta) => delta a -> delta () -> delta (NonEmpty a)
+someUntil_ synGo synEnd =
+  nonEmptyIso . cons /$/ synGo /*/ manyUntil_ synGo synEnd
+
+manyUntil :: AbstractSyntax delta => delta a -> delta b -> delta ([a],b)
+manyUntil synGo synEnd = go where
+  go = (Iso (Just . ([],)) (\(as,b) -> case as of
+      [] -> Just b
+      -- isn't at the end, don't print anything here
+      _ : as' -> Nothing
+    ) /$/ synEnd)
+    /+/ (iso
+          (\(a,(as,b)) -> (a:as,b))
+          -- doesn't need [] because it is caught on synEnd iso
+          (\(a:as,b) -> (a,(as,b)))
+          /$/ synGo /*/ go
+        )
+
+someUntil :: AbstractSyntax delta => delta a -> delta b -> delta (NonEmpty a,b)
 someUntil synGo synEnd =
-  nonEmptyIso . cons /$/ synGo /*/ manyUntil synGo synEnd
+  -- TODO: can probably use what I typed as isoUncurry over at papel here
+  iso (\(a,(as,b)) -> (a:|as,b)) (\(a:|as,b) ->(a,(as,b)))
+    /$/ synGo /*/ manyUntil synGo synEnd
 
 -- | The 'replicate' combinator is used to repeat syntax.
 -- @replicate n p@ repeats the passwd syntax @p@
