@@ -24,7 +24,7 @@ data Document = Document {
 $(defineIsomorphisms ''Document)
 
 docSyn :: SyntaxT Char Document
-docSyn = document /$/ (this '#' */ manyUntil token (this '\n'))
+docSyn = document /$/ (this '#' */ manyUntil_ token (this '\n'))
     -- consume remaining token
     /* this '\n'
 
@@ -65,7 +65,7 @@ notFollowedBySyn = notFollowedBy (this 'a') */ token
 
 manyUntilSyn :: SyntaxT Char String
 manyUntilSyn = 
-    manyUntil token (this 'b') 
+    manyUntil_ token (this 'b') 
     -- consume the missing token
       /* this 'b'
 
