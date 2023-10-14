@@ -26,6 +26,7 @@ import Control.Isomorphism.Partial.Ext
 import Text.Syntax.Poly.Class
   ((/*/), (/+/),AbstractSyntax(..), Syntax(..), IsoAlternative(..))
 import Data.List.NonEmpty (NonEmpty(..))
+import Data.Maybe
 
 -- | 'none' parses\/prints empty tokens stream consume\/produces a empty list.
 none :: AbstractSyntax delta => delta [alpha]
@@ -44,11 +45,11 @@ many p = some p /+/ none
 some :: AbstractSyntax delta => delta alpha -> delta [alpha]
 some p = cons /$/ p /*/ many p
 
-manyUntil_ :: (Eq a ,AbstractSyntax delta) => delta a -> delta () -> delta [a]
+manyUntil_ :: (Eq a ,AbstractSyntax delta) => delta a -> delta b -> delta [a]
 manyUntil_ synGo synEnd = go where
   go = (notFollowedBy synEnd */ (cons /$/ (synGo /*/ go))) /+/ syntax []
 
-someUntil_ :: (Eq a, AbstractSyntax delta) => delta a -> delta () -> delta (NonEmpty a)
+someUntil_ :: (Eq a, AbstractSyntax delta) => delta a -> delta b -> delta (NonEmpty a)
 someUntil_ synGo synEnd =
   nonEmptyIso . cons /$/ synGo /*/ manyUntil_ synGo synEnd
 
@@ -189,8 +190,9 @@ format tks = ignore (Just ()) /$/ optional (list tks)
 --notFollowedBy :: (AbstractSyntax delta) => delta () -> delta ()
 --notFollowedBy op = inverse (isoFail False id) /$/ bool op
 
-notFollowedBy :: (AbstractSyntax delta) => delta () -> delta ()
-notFollowedBy op = inverse (element False) /$/ bool op
+notFollowedBy :: (AbstractSyntax delta) => delta alpha -> delta ()
+notFollowedBy op = Iso (\b -> if isNothing b then Just () else Nothing) (const $ Just Nothing) 
+  /$/ optional op
 
 nonEmptyIso = iso NE.fromList NE.toList
 
